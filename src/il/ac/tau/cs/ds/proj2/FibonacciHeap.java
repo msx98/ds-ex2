@@ -1,4 +1,4 @@
-package heap;
+package il.ac.tau.cs.ds.proj2;
 
 /**
  * FibonacciHeap
@@ -7,16 +7,26 @@ package heap;
  */
 public class FibonacciHeap
 {
+    HeapNode minNode;   //Pointer for the minimum node of the forest
+    int size, markedNodes, numOfTrees;
+    public HeapNode head = minNode;
+    public HeapNode tail;
 
+    public FibonacciHeap() {
+        this.size = 0;
+        this.markedNodes = 0;
+        this.numOfTrees = 0;
+        this.minNode = null;
+    }
     /**
      * public boolean isEmpty()
      *
      * Returns true if and only if the heap is empty.
-     *
+     * @complexity == O(1)
      */
     public boolean isEmpty()
     {
-        return false; // should be replaced by student code
+        return this.minNode == null; // should be replaced by student code
     }
 
     /**
@@ -26,10 +36,34 @@ public class FibonacciHeap
      * The added key is assumed not to already belong to the heap.
      *
      * Returns the newly created node.
+     *
+     * @complexity == O(1)
      */
     public HeapNode insert(int key)
     {
-        return new HeapNode(key); // should be replaced by student code
+        HeapNode node = new HeapNode(key);
+        this.size++;
+        this.numOfTrees++;
+
+        // If the heap is empty,
+        if (this.isEmpty()) {
+            this.minNode = node;
+            return node;
+        }
+
+        // If we're adding a new root for the forest
+        HeapNode temp = minNode.next;
+        node.setNext(temp);
+        node.setPrev(minNode);
+        minNode.setNext(node);
+        temp.setPrev(node);
+
+        // updating the minimum pointer in case we added new minimal key
+        if (minNode.key > key) {
+            this.minNode = node;
+        }
+
+        return node;
     }
 
     /**
@@ -49,10 +83,11 @@ public class FibonacciHeap
      *
      * Returns the node of the heap whose key is minimal, or null if the heap is empty.
      *
+     * @complexity == O(1)
      */
     public HeapNode findMin()
     {
-        return new HeapNode(678);// should be replaced by student code
+        return this.minNode;// should be replaced by student code
     }
 
     /**
@@ -71,10 +106,11 @@ public class FibonacciHeap
      *
      * Returns the number of elements in the heap.
      *
+     * @complexity == O(1)
      */
     public int size()
     {
-        return -123; // should be replaced by student code
+        return this.size; // should be replaced by student code
     }
 
     /**
@@ -121,10 +157,12 @@ public class FibonacciHeap
      *
      * In words: The potential equals to the number of trees in the heap
      * plus twice the number of marked nodes in the heap.
+     *
+     * @complexity == O(1)
      */
     public int potential()
     {
-        return -234; // should be replaced by student code
+        return this.numOfTrees + 2*this.markedNodes; // should be replaced by student code
     }
 
     /**
@@ -137,7 +175,7 @@ public class FibonacciHeap
      */
     public static int totalLinks()
     {
-        return -345; // should be replaced by student code
+        return 222; // should be replaced by student code
     }
 
     /**
@@ -175,21 +213,70 @@ public class FibonacciHeap
      */
     public static class HeapNode {
 
-        public int key;
-        public String info;
+        int key, rank;
+        HeapNode parent, child, next, prev;
+        boolean mark;
 
-        public HeapNode(int key, String val) {
+        public HeapNode(int key) {
             this.key = key;
-            this.info = val;
+            this.rank = 0;
+            this.parent = null;
+            this.child = null;
+            this.next = null;
+            this.prev = null;
+            this.mark = false;
         }
 
-        public void setKey(int key) {
-            this.key = key;
+        /**
+        * all get methods
+        *
+        * @complexity == O(1) for all
+        * */
+
+        public HeapNode getParent() {
+            return this.parent;
         }
 
-    
+        public HeapNode getChild() {
+            return this.child;
+        }
+
+        public HeapNode getNext() {
+            return this.next;
+        }
+
+        public HeapNode getPrev() {
+            return this.prev;
+        }
+
         public int getKey() {
             return this.key;
+        }
+
+        public int getRank() {
+            return rank;
+        }
+
+        /**
+        * all set methods
+        *
+        * @complexity == O(1) for all
+        * */
+
+        public void setParent(HeapNode parent) {
+            this.parent = parent;
+        }
+
+        public void setChild(HeapNode child) {
+            this.child = child;
+        }
+
+        public void setNext(HeapNode next) {
+            this.next = next;
+        }
+
+        public void setPrev(HeapNode prev) {
+            this.prev = prev;
         }
     }
 
