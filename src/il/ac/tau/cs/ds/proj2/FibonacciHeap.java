@@ -108,7 +108,7 @@ public class FibonacciHeap
 	/**
 	 * public void meld (FibonacciHeap heap2)
 	 *
-	 * Melds heap2 with the current heap in order:
+	 * (lazy) melds heap2 with the current heap in order:
 	 * 		this -> heap2
 	 *
 	 */
