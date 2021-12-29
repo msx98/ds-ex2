@@ -7,278 +7,397 @@ package il.ac.tau.cs.ds.proj2;
  */
 public class FibonacciHeap
 {
-    HeapNode minNode;   //Pointer for the minimum node of the forest
-    int size, markedNodes, numOfTrees;
-    public HeapNode head = minNode;
-    public HeapNode tail;
+	int numOfNodes, markedNodes, numOfTrees;
+	HeapNode minNode; // this is the node with the minimum key
+	HeapNode first; // on insertion, this shall be the newest
+	
+	private void assertSanity() {
+		if (!Logger.FLAG_DEBUG) return;
+		
+		Logger.assertd_iff(this.isEmpty(), this.size() == 0, this.numOfNodes==0,
+				this.numOfTrees==0, this.minNode==null, this.first==null);
+		
+		
+	}
 
-    public FibonacciHeap() {
-        this.size = 0;
-        this.markedNodes = 0;
-        this.numOfTrees = 0;
-        this.minNode = null;
-    }
-    /**
-     * public boolean isEmpty()
-     *
-     * Returns true if and only if the heap is empty.
-     * @complexity == O(1)
-     */
-    public boolean isEmpty()
-    {
-        return this.minNode == null; // should be replaced by student code
-    }
+	public FibonacciHeap() {
+		this.numOfNodes = 0;
+		this.markedNodes = 0;
+		this.numOfTrees = 0;
+		this.minNode = null;
+		Logger.assertd_iff(true, true, true, true);
+	}
+	/**
+	 * public boolean isEmpty()
+	 *
+	 * Returns true if and only if the heap is empty.
+	 * @complexity: O(1)
+	 */
+	public boolean isEmpty()
+	{
+		boolean result = this.minNode == null;
+		
+		Logger.assertd_iff(result, this.size() == 0, this.numOfNodes==0,
+				this.numOfTrees==0, this.minNode==null, this.first==null);
+		
+		return result;
+	}
 
-    /**
-     * public HeapNode insert(int key)
-     *
-     * Creates a node (of type HeapNode) which contains the given key, and inserts it into the heap.
-     * The added key is assumed not to already belong to the heap.
-     *
-     * Returns the newly created node.
-     *
-     * @complexity == O(1)
-     */
-    public HeapNode insert(int key)
-    {
-        HeapNode node = new HeapNode(key);
-        this.size++;
-        this.numOfTrees++;
+	/**
+	 * public HeapNode insert(int key)
+	 *
+	 * Creates a node (of type HeapNode) which contains the given key, and inserts it into the heap.
+	 * The added key is assumed not to already belong to the heap.
+	 *
+	 * Returns the newly created node.
+	 *
+	 * @complexity: O(1)
+	 */
+	public HeapNode insert(int key)
+	{
+		HeapNode node = new HeapNode(key);
 
-        // If the heap is empty,
-        if (this.isEmpty()) {
-            this.minNode = node;
-            return node;
-        }
+		if (this.isEmpty()) {
+			this.minNode = node;
+			this.first   = node;
+		} else {
+			// add to leftmost
+			node.setPrev(this.first.getPrev());
+			node.setNext(this.first);
+			this.first.setPrev(node);
+			this.first = node;
+			
+			// update min pointer accordingly
+			if (this.minNode.getKey() > node.getKey()) {
+				this.minNode = node;
+			}
+		}
 
-        // If we're adding a new root for the forest
-        HeapNode temp = minNode.next;
-        node.setNext(temp);
-        node.setPrev(minNode);
-        minNode.setNext(node);
-        temp.setPrev(node);
+		// update object parameters
+		numOfNodes++; // added a new node 
+		numOfTrees += 1; // this is technically a new tree
+		
+		return node;
+	}
 
-        // updating the minimum pointer in case we added new minimal key
-        if (minNode.key > key) {
-            this.minNode = node;
-        }
+	/**
+	 * public void deleteMin()
+	 *
+	 * Deletes the node containing the minimum key.
+	 *
+	 */
+	public void deleteMin()
+	{
+		// FIXME - missing implementation
+		return;
 
-        return node;
-    }
+	}
 
-    /**
-     * public void deleteMin()
-     *
-     * Deletes the node containing the minimum key.
-     *
-     */
-    public void deleteMin()
-    {
-        return; // should be replaced by student code
+	/**
+	 * public HeapNode findMin()
+	 *
+	 * Returns the node of the heap whose key is minimal, or null if the heap is empty.
+	 *
+	 * @complexity: O(1)
+	 */
+	public HeapNode findMin()
+	{
+		return this.minNode;
+	}
 
-    }
+	/**
+	 * public void meld (FibonacciHeap heap2)
+	 *
+	 * Melds heap2 with the current heap in order:
+	 * 		this -> heap2
+	 *
+	 */
+	public void meld (FibonacciHeap heap2)
+	{
+		if (heap2 == null) return;
+		
+		if (this.isEmpty() && heap2.isEmpty()) {
+			// both are empty
+			// do nothing
+		} else if (this.isEmpty() && !heap2.isEmpty()) {
+			// only this is empty
+			// simply update all object properties
+			heap2.copyTo(this);
+		} else if (!this.isEmpty() && heap2.isEmpty()) {
+			// only heap2 is empty
+			// simply update all object properties
+			this.copyTo(heap2);
+		} else {
+			// neither are empty
+			this.minNode = this.findMin().getKey() < heap2.findMin().getKey() ?
+					this.minNode
+					: heap2.minNode;
+			
+			HeapNode thisFirst = this.getFirst();
+			HeapNode thisLast = this.getLast();
+			HeapNode secFirst = heap2.getFirst();
+			HeapNode secLast = heap2.getLast();
+			
+			thisFirst.setPrev(secLast);
+			secLast.setNext(thisFirst);
+			thisLast.setNext(secFirst);
+			secFirst.setPrev(thisLast);
+			
+			this.numOfNodes  += heap2.numOfNodes;
+			this.numOfTrees  += heap2.numOfTrees;
+			this.markedNodes += heap2.markedNodes;
+			
+			this.copyTo(heap2);
+		}
+	}
 
-    /**
-     * public HeapNode findMin()
-     *
-     * Returns the node of the heap whose key is minimal, or null if the heap is empty.
-     *
-     * @complexity == O(1)
-     */
-    public HeapNode findMin()
-    {
-        return this.minNode;// should be replaced by student code
-    }
+	/**
+	 * public int size()
+	 *
+	 * Returns the number of elements in the heap.
+	 *
+	 * @complexity: O(1)
+	 */
+	public int size()
+	{
+		return this.numOfNodes;
+	}
 
-    /**
-     * public void meld (FibonacciHeap heap2)
-     *
-     * Melds heap2 with the current heap.
-     *
-     */
-    public void meld (FibonacciHeap heap2)
-    {
-        return; // should be replaced by student code
-    }
+	/**
+	 * public int[] countersRep()
+	 *
+	 * Return an array of counters. The i-th entry contains the number of trees of order i in the heap.
+	 * Note: The size of of the array depends on the maximum order of a tree, and an empty heap returns an empty array.
+	 *
+	 */
+	public int[] countersRep()
+	{
+		// FIXME - missing implementation
+		int[] arr = new int[100];
+		return arr;
+	}
 
-    /**
-     * public int size()
-     *
-     * Returns the number of elements in the heap.
-     *
-     * @complexity == O(1)
-     */
-    public int size()
-    {
-        return this.size; // should be replaced by student code
-    }
+	/**
+	 * public void delete(HeapNode x)
+	 *
+	 * Deletes the node x from the heap.
+	 * It is assumed that x indeed belongs to the heap.
+	 *
+	 */
+	public void delete(HeapNode x)
+	{
+		// FIXME - missing implementation
+		return;
+	}
 
-    /**
-     * public int[] countersRep()
-     *
-     * Return an array of counters. The i-th entry contains the number of trees of order i in the heap.
-     * Note: The size of of the array depends on the maximum order of a tree, and an empty heap returns an empty array.
-     *
-     */
-    public int[] countersRep()
-    {
-        int[] arr = new int[100];
-        return arr; //	 to be replaced by student code
-    }
+	/**
+	 * public void decreaseKey(HeapNode x, int delta)
+	 *
+	 * Decreases the key of the node x by a non-negative value delta. The structure of the heap should be updated
+	 * to reflect this change (for example, the cascading cuts procedure should be applied if needed).
+	 */
+	public void decreaseKey(HeapNode x, int delta)
+	{
+		// FIXME - missing implementation
+		return;
+	}
 
-    /**
-     * public void delete(HeapNode x)
-     *
-     * Deletes the node x from the heap.
-     * It is assumed that x indeed belongs to the heap.
-     *
-     */
-    public void delete(HeapNode x)
-    {
-        return; // should be replaced by student code
-    }
+	/**
+	 * public int potential()
+	 *
+	 * This function returns the current potential of the heap, which is:
+	 * Potential = #trees + 2*#marked
+	 *
+	 * In words: The potential equals to the number of trees in the heap
+	 * plus twice the number of marked nodes in the heap.
+	 *
+	 * @complexity: O(1)
+	 */
+	public int potential()
+	{
+		return this.numOfTrees + 2*this.markedNodes;
+	}
 
-    /**
-     * public void decreaseKey(HeapNode x, int delta)
-     *
-     * Decreases the key of the node x by a non-negative value delta. The structure of the heap should be updated
-     * to reflect this change (for example, the cascading cuts procedure should be applied if needed).
-     */
-    public void decreaseKey(HeapNode x, int delta)
-    {
-        return; // should be replaced by student code
-    }
+	/**
+	 * public static int totalLinks()
+	 *
+	 * This static function returns the total number of link operations made during the
+	 * run-time of the program. A link operation is the operation which gets as input two
+	 * trees of the same rank, and generates a tree of rank bigger by one, by hanging the
+	 * tree which has larger value in its root under the other tree.
+	 */
+	public static int totalLinks()
+	{
+		return Logger.COUNT_LINKS; // FIXME - might not wanna use Logger
+	}
 
-    /**
-     * public int potential()
-     *
-     * This function returns the current potential of the heap, which is:
-     * Potential = #trees + 2*#marked
-     *
-     * In words: The potential equals to the number of trees in the heap
-     * plus twice the number of marked nodes in the heap.
-     *
-     * @complexity == O(1)
-     */
-    public int potential()
-    {
-        return this.numOfTrees + 2*this.markedNodes; // should be replaced by student code
-    }
+	/**
+	 * public static int totalCuts()
+	 *
+	 * This static function returns the total number of cut operations made during the
+	 * run-time of the program. A cut operation is the operation which disconnects a subtree
+	 * from its parent (during decreaseKey/delete methods).
+	 */
+	public static int totalCuts()
+	{
+		return Logger.COUNT_CUTS; // FIXME - might not wanna use Logger
+	}
 
-    /**
-     * public static int totalLinks()
-     *
-     * This static function returns the total number of link operations made during the
-     * run-time of the program. A link operation is the operation which gets as input two
-     * trees of the same rank, and generates a tree of rank bigger by one, by hanging the
-     * tree which has larger value in its root under the other tree.
-     */
-    public static int totalLinks()
-    {
-        return 222; // should be replaced by student code
-    }
+	/**
+	 * public static int[] kMin(FibonacciHeap H, int k)
+	 *
+	 * This static function returns the k smallest elements in a Fibonacci heap that contains a single tree.
+	 * The function should run in O(k*deg(H)). (deg(H) is the degree of the only tree in H.)
+	 *
+	 * ###CRITICAL### : you are NOT allowed to change H.
+	 */
+	public static int[] kMin(FibonacciHeap H, int k)
+	{
+		// FIXME - missing implementation
+		int[] arr = new int[100];
+		return arr;
+	}
+	
+	/**
+	 * private HeapNode getFirst()
+	 * 
+	 * Returns pointer to first node in heap
+	 * @complexity: O(1)
+	 */
+	private HeapNode getFirst()
+	{
+		if (this.isEmpty()) return null;
+		else                return this.first;
+	}
+	
+	/**
+	 * private HeapNode getLast()
+	 * 
+	 * Returns pointer to last node in heap
+	 * @complexity: O(1)
+	 */
+	private HeapNode getLast()
+	{
+		if (this.isEmpty()) return null;
+		else                return this.getFirst().getPrev();
+	}
+	
+	/**
+	 * private void copyFrom(FibonacciHeap H)
+	 * 
+	 * Copies all properties of H into this
+	 * @complexity: O(1)
+	 */
+	private void copyFrom(FibonacciHeap H)
+	{
+		Logger.assertd(H != null);
+		if (H == null) return;
+		this.minNode     = H.minNode;
+		this.first       = H.first;
+		this.numOfNodes  = H.numOfNodes;
+		this.numOfTrees  = H.numOfTrees;
+		this.markedNodes = H.markedNodes;
+	}
+	
+	/**
+	 * private void copyTo(FibonacciHeap H)
+	 * 
+	 * Copies all properties of this into H
+	 * @complexity: O(1)
+	 */
+	private void copyTo(FibonacciHeap H)
+	{
+		Logger.assertd(H != null);
+		if (H == null) return;
+		H.copyFrom(this);
+	}
+	
+	/**
+	 * private void consolidate()
+	 * 
+	 * This function consolidates H, altering it
+	 * @complexity: O(logn) // FIXME - is this the complexity?
+	 */
+	private static void consolidate(FibonacciHeap H)
+	{
+		// FIXME - missing implementation
+	}
 
-    /**
-     * public static int totalCuts()
-     *
-     * This static function returns the total number of cut operations made during the
-     * run-time of the program. A cut operation is the operation which disconnects a subtree
-     * from its parent (during decreaseKey/delete methods).
-     */
-    public static int totalCuts()
-    {
-        return -456; // should be replaced by student code
-    }
+	/**
+	 * public class HeapNode
+	 *
+	 * If you wish to implement classes other than FibonacciHeap
+	 * (for example HeapNode), do it in this file, not in another file.
+	 *
+	 */
+	public static class HeapNode {
 
-    /**
-     * public static int[] kMin(FibonacciHeap H, int k)
-     *
-     * This static function returns the k smallest elements in a Fibonacci heap that contains a single tree.
-     * The function should run in O(k*deg(H)). (deg(H) is the degree of the only tree in H.)
-     *
-     * ###CRITICAL### : you are NOT allowed to change H.
-     */
-    public static int[] kMin(FibonacciHeap H, int k)
-    {
-        int[] arr = new int[100];
-        return arr; // should be replaced by student code
-    }
+		int key, rank;
+		HeapNode parent, child, next, prev;
+		boolean mark;
 
-    /**
-     * public class HeapNode
-     *
-     * If you wish to implement classes other than FibonacciHeap
-     * (for example HeapNode), do it in this file, not in another file.
-     *
-     */
-    public static class HeapNode {
+		public HeapNode(int key) {
+			this.key = key;
+			this.rank = 0;
+			this.next = this;
+			this.prev = this;
+			this.parent = null;
+			this.child = null;
+			this.mark = false;
+		}
 
-        int key, rank;
-        HeapNode parent, child, next, prev;
-        boolean mark;
+		/**
+		* all get methods
+		*
+		* @complexity: O(1) for all
+		* */
 
-        public HeapNode(int key) {
-            this.key = key;
-            this.rank = 0;
-            this.parent = null;
-            this.child = null;
-            this.next = null;
-            this.prev = null;
-            this.mark = false;
-        }
+		public HeapNode getParent() {
+			return this.parent;
+		}
 
-        /**
-        * all get methods
-        *
-        * @complexity == O(1) for all
-        * */
+		public HeapNode getChild() {
+			return this.child;
+		}
 
-        public HeapNode getParent() {
-            return this.parent;
-        }
+		public HeapNode getNext() {
+			return this.next;
+		}
 
-        public HeapNode getChild() {
-            return this.child;
-        }
+		public HeapNode getPrev() {
+			return this.prev;
+		}
 
-        public HeapNode getNext() {
-            return this.next;
-        }
+		public int getKey() {
+			return this.key;
+		}
 
-        public HeapNode getPrev() {
-            return this.prev;
-        }
+		public int getRank() {
+			return rank;
+		}
 
-        public int getKey() {
-            return this.key;
-        }
+		/**
+		* all set methods
+		*
+		* @complexity: O(1) for all
+		* */
 
-        public int getRank() {
-            return rank;
-        }
+		public void setParent(HeapNode parent) {
+			this.parent = parent;
+		}
 
-        /**
-        * all set methods
-        *
-        * @complexity == O(1) for all
-        * */
+		public void setChild(HeapNode child) {
+			this.child = child;
+		}
 
-        public void setParent(HeapNode parent) {
-            this.parent = parent;
-        }
+		public void setNext(HeapNode next) {
+			this.next = next;
+		}
 
-        public void setChild(HeapNode child) {
-            this.child = child;
-        }
-
-        public void setNext(HeapNode next) {
-            this.next = next;
-        }
-
-        public void setPrev(HeapNode prev) {
-            this.prev = prev;
-        }
-    }
+		public void setPrev(HeapNode prev) {
+			this.prev = prev;
+		}
+	}
 
 }
 
@@ -297,6 +416,13 @@ final class Logger {
 			}
 		}
 	}
+	
+	public static void assertd_iff(boolean ... conditions) {
+		if (!FLAG_DEBUG) return;
+		for (int i=1; i<conditions.length; i++) {
+			assertd((conditions[0]&&conditions[i]) || (!conditions[0] && !conditions[i]));
+		}
+	}
 
 	public static void logd(String s) {
 		if (FLAG_VERBOSE)
@@ -304,9 +430,8 @@ final class Logger {
 	}
 	
 	public static int ASSERTION_TRIGGERS  = 0;
-	public static int TOTAL_INSERTIONS    = 0;
-	public static int TOTAL_DELETIONS     = 0;
-	public static int TOTAL_SPLITS        = 0;
-	public static int TOTAL_JOINS         = 0;
-	public static int TOTAL_BALANCE       = 0;
+	public static int COUNT_INSERTIONS	  = 0; // FIXME - never updated
+	public static int COUNT_DELETIONS	  = 0; // FIXME - never updated
+	public static int COUNT_LINKS         = 0; // FIXME - never updated (and required)
+	public static int COUNT_CUTS          = 0; // FIXME - never updated (and required)
 }
