@@ -281,3 +281,32 @@ public class FibonacciHeap
     }
 
 }
+
+
+final class Logger {
+	private Logger() {}
+	public static final boolean FLAG_DEBUG   = true; // FIXME - change to false before assignment
+	public static final boolean FLAG_VERBOSE = true; // FIXME - change to false before assignment
+	
+	public static void assertd(boolean condition) {
+		if (FLAG_DEBUG) {
+			if (!condition) {
+				Logger.ASSERTION_TRIGGERS += 1;
+				System.out.println("About to throw assertion");
+				assert (condition);
+			}
+		}
+	}
+
+	public static void logd(String s) {
+		if (FLAG_VERBOSE)
+			System.out.println(s);
+	}
+	
+	public static int ASSERTION_TRIGGERS  = 0;
+	public static int TOTAL_INSERTIONS    = 0;
+	public static int TOTAL_DELETIONS     = 0;
+	public static int TOTAL_SPLITS        = 0;
+	public static int TOTAL_JOINS         = 0;
+	public static int TOTAL_BALANCE       = 0;
+}
