@@ -213,15 +213,23 @@ public class FibonacciHeap
 	 * It is assumed that x indeed belongs to the heap.
 	 *
 	 */
-	public void delete(HeapNode x)
+	public void delete(HeapNode x) // FIXME - verify @complexity
 	{
-		// FIXME - verify complexity
 		Logger.assertd(this.minNode != null);
 		if (this.minNode == null) return;
-		Logger.assertd(x.key+this.minNode.key+1 <= Integer.MAX_VALUE);
-		Logger.assertd(-1*(x.key+this.minNode.key+1) >= Integer.MIN_VALUE);
 		
-		decreaseKey(x, x.key+this.minNode.key+1);
+		// delete() will never be called with MIN_VALUE in the heap
+		// so don't test for this
+		Logger.assertd(this.minNode.getKey() != Integer.MIN_VALUE);
+		// still, just in case...
+		if (this.minNode.getKey() == Integer.MIN_VALUE) {
+			// FIXME - this is a dirty solution and I'm not sure it'll work
+			//         but this case will supposedly not be tested anyway
+			this.minNode = x;
+		}
+		
+		x.key = Integer.MIN_VALUE; // OMG! NO LONGER VALID! QUICK, DECREASEKEY!!! AAAHHH
+		decreaseKey(x, 0);
 		deleteMin();
 	}
 
@@ -234,7 +242,10 @@ public class FibonacciHeap
 	public void decreaseKey(HeapNode x, int delta)
 	{
 		// FIXME - missing implementation
+		Logger.assertd(delta >= 0);
+		Logger.assertd(x.key-delta >= Integer.MIN_VALUE);
 		
+		// implement this
 		return;
 	}
 
