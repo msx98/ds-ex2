@@ -11,13 +11,18 @@ public class FibonacciHeap
 	HeapNode minNode; // this is the node with the minimum key
 	HeapNode first; // on insertion, this shall be the newest
 	
-	private void assertSanity() {
-		if (!Logger.FLAG_DEBUG) return;
-		
+	private void assertNumOfTrees() {
+		// FIXME - missing implementation
+	}
+	
+	private void assertIsEmpty() {
 		Logger.assertd_iff(this.isEmpty(), this.size() == 0, this.numOfNodes==0,
 				this.numOfTrees==0, this.minNode==null, this.first==null);
-		
-		
+	}
+	
+	private void assertSanity() {
+		assertIsEmpty();
+		assertNumOfTrees();
 	}
 
 	public FibonacciHeap() {
@@ -168,12 +173,29 @@ public class FibonacciHeap
 	 *
 	 * Return an array of counters. The i-th entry contains the number of trees of order i in the heap.
 	 * Note: The size of of the array depends on the maximum order of a tree, and an empty heap returns an empty array.
+	 * No requirements on complexity
 	 *
+	 * @complexity: O(n)
 	 */
 	public int[] countersRep()
 	{
-		// FIXME - missing implementation
-		int[] arr = new int[100];
+		if (this.isEmpty()) return new int[0];
+
+		// get max rank first
+		int maxRank = 0;
+		HeapNode p = this.first;
+		do {
+			maxRank = Math.max(maxRank, p.getRank());
+		} while (p.getNext() != this.first); 
+		int[] arr = new int[maxRank+1];
+		for (int i=0; i<=maxRank; i++) arr[i] = 0;
+		
+		// now fill array
+		p = this.first;
+		do {
+			arr[p.getRank()]++;
+		} while (p.getNext() != this.first);
+		
 		return arr;
 	}
 
