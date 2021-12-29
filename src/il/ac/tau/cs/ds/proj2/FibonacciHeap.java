@@ -67,9 +67,14 @@ public class FibonacciHeap
 			this.first   = node;
 		} else {
 			// add to leftmost
-			node.setPrev(this.first.getPrev());
+			
+			HeapNode last = this.getLast();
+			node.setPrev(last);
+			last.setNext(node);
+			
 			node.setNext(this.first);
 			this.first.setPrev(node);
+			
 			this.first = node;
 			
 			// update min pointer accordingly
@@ -186,7 +191,8 @@ public class FibonacciHeap
 		HeapNode p = this.first;
 		do {
 			maxRank = Math.max(maxRank, p.getRank());
-		} while (p.getNext() != this.first); 
+			p = p.getNext();
+		} while (p != this.first); 
 		int[] arr = new int[maxRank+1];
 		for (int i=0; i<=maxRank; i++) arr[i] = 0;
 		
@@ -194,7 +200,8 @@ public class FibonacciHeap
 		p = this.first;
 		do {
 			arr[p.getRank()]++;
-		} while (p.getNext() != this.first);
+			p = p.getNext();
+		} while (p != this.first);
 		
 		return arr;
 	}
@@ -208,8 +215,14 @@ public class FibonacciHeap
 	 */
 	public void delete(HeapNode x)
 	{
-		// FIXME - missing implementation
-		return;
+		// FIXME - verify complexity
+		Logger.assertd(this.minNode != null);
+		if (this.minNode == null) return;
+		Logger.assertd(x.key+this.minNode.key+1 <= Integer.MAX_VALUE);
+		Logger.assertd(-1*(x.key+this.minNode.key+1) >= Integer.MIN_VALUE);
+		
+		decreaseKey(x, x.key+this.minNode.key+1);
+		deleteMin();
 	}
 
 	/**
@@ -221,6 +234,7 @@ public class FibonacciHeap
 	public void decreaseKey(HeapNode x, int delta)
 	{
 		// FIXME - missing implementation
+		
 		return;
 	}
 
@@ -335,14 +349,61 @@ public class FibonacciHeap
 	}
 	
 	/**
-	 * private void consolidate()
+	 * private static void consolidate(FibonacciHeap H)
 	 * 
 	 * This function consolidates H, altering it
-	 * @complexity: O(logn) // FIXME - is this the complexity?
+	 * @complexity: O(n) // FIXME - is this the complexity?
 	 */
 	private static void consolidate(FibonacciHeap H)
 	{
 		// FIXME - missing implementation
+		if (H == null || H.isEmpty()) return;
+		
+		// we don't need to be precise with maxRank, we just need this to be LARGER than maxRank
+		// and this does it in O(1) without needing to maintain maxRank
+		int maxRank = (int) Math.ceil(Math.log10(H.numOfTrees)/Math.log10(2));
+		HeapNode rootInRank[] = new HeapNode[maxRank+1];
+		for (int i=0; i<=maxRank; i++) rootInRank[i] = null;
+		
+		HeapNode p = H.getFirst();
+		HeapNode pNext;
+		HeapNode pLast = H.getLast();
+		do {
+			
+		} while (p != pLast);
+	}
+	
+	/**
+	 * private static HeapNode joinTwoRoots(HeapNode node1, HeapNode node2)
+	 * 
+	 * @pre: node1.rank == node2.rank
+	 * @pre: node*.prev == node*.next == node*.parent == null 
+	 * @pre: node* != null
+	 * @post: new root
+	 */
+	private static HeapNode joinTwoRoots(HeapNode node1, HeapNode node2) {
+		Logger.assertd(node1.rank == node2.rank);
+		Logger.assertd(node1.prev == null && node1.next == null && node1.parent == null);
+		Logger.assertd(node2.prev == null && node2.next == null && node2.parent == null);
+		Logger.assertd(node1 != null && node2 != null);
+		
+		HeapNode newRoot  = (node1.getKey() < node2.getKey())? node1 :node2;
+		HeapNode newChild = (node1.getKey() < node2.getKey())? node2 :node1;
+		
+		if (newRoot.getChild() == null) {
+			
+		}
+		
+		return newRoot;
+	}
+	
+	/**
+	 * private static double log2(double x)
+	 * 
+	 * Returns log(x) in base 2
+	 */
+	private static double log2(double x) {
+		return Math.log10(x)/Math.log10(2);
 	}
 
 	/**
