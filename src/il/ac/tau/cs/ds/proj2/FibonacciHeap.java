@@ -30,8 +30,8 @@ public class FibonacciHeap
 		this.markedNodes = 0;
 		this.numOfTrees = 0;
 		this.minNode = null;
-		Logger.assertd_iff(true, true, true, true);
 	}
+	
 	/**
 	 * public boolean isEmpty()
 	 *
@@ -99,6 +99,9 @@ public class FibonacciHeap
 	public void deleteMin()
 	{
 		// FIXME - missing implementation
+		HeapNode pNewChildren;
+		
+		
 		return;
 
 	}
@@ -241,12 +244,30 @@ public class FibonacciHeap
 	 */
 	public void decreaseKey(HeapNode x, int delta)
 	{
-		// FIXME - missing implementation
 		Logger.assertd(delta >= 0);
-		Logger.assertd(x.key-delta >= Integer.MIN_VALUE);
+		Logger.assertd(Integer.MIN_VALUE <= x.key-delta && x.key-delta <= Integer.MAX_VALUE);
 		
-		// implement this
-		return;
+		x.key = x.key-delta;
+		if (x.getParent() == null) {
+			if (x.getKey() < this.minNode.getKey()) {
+				this.minNode = x;
+				return;
+			} else {
+				// aight
+				return;
+			}
+		} else {
+			if (x.getKey() < x.getParent().getKey()) {
+				// OH NO! We broke the Binomial Tree property!
+				// We commence the cutting
+				// FIXME - missing implementation. This is an important scenario
+				return;
+			} else {
+				// coolio
+				return;
+			}
+		}
+		
 	}
 
 	/**
@@ -303,6 +324,36 @@ public class FibonacciHeap
 		// FIXME - missing implementation
 		int[] arr = new int[100];
 		return arr;
+	}
+	
+	private static void unmarkAndOrphanSiblings(HeapNode first) {
+		
+	}
+	
+	/**
+	 * private static FibonacciHeap createFibonacciHeapFromNode(HeapNode first)
+	 * @param: first
+	 * @return: new FibonacciHeap with correct properties and first node first
+	 * @complexity: O(s) with n being the number of siblings of first
+	 */
+	private static FibonacciHeap createFibonacciHeapFromNode(HeapNode first) {
+		FibonacciHeap H = new FibonacciHeap();
+		if (first == null) return H;
+		H.first = first;
+		H.minNode = first;
+		H.numOfNodes = 1;
+		H.markedNodes = 0;
+		
+		HeapNode p = H.first;	
+		do {
+			p.setParent(null); // FIXME - do we want this here or outside?
+			if (H.minNode.getKey() < p.getKey()) H.minNode = p;
+			H.numOfNodes++;
+			p.mark = false;
+			p = p.getNext();
+		} while (p != H.first);
+		
+		return H;
 	}
 	
 	/**
@@ -467,7 +518,15 @@ public class FibonacciHeap
 		}
 
 		public int getRank() {
-			return rank;
+			return this.rank;
+		}
+		
+		public boolean getMark() {
+			return this.mark;
+		}
+		
+		public boolean isMarked() {
+			return this.getMark() == true;
 		}
 
 		/**
@@ -490,6 +549,10 @@ public class FibonacciHeap
 
 		public void setPrev(HeapNode prev) {
 			this.prev = prev;
+		}
+		
+		public void setMark(boolean mark) {
+			this.mark = mark;
 		}
 	}
 
