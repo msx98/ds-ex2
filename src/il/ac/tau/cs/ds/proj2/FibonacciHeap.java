@@ -111,11 +111,54 @@ public class FibonacciHeap
 	public void deleteMin()
 	{
 		// FIXME - missing implementation
-		HeapNode pNewChildren;
+		Logger.assertd(!this.isEmpty());
+		if (this.isEmpty()) return;
+		HeapNode p = this.minNode;
+		HeapNode pPrev = p.getPrev();
+		HeapNode pNext = p.getNext();
+		HeapNode pChild = p.getChild();
+		Logger.assertd_iff(p==pNext,p==pPrev);
 		
+		if (pChild == null) return;
+		
+		int howManySiblings = calcNumberOfSiblings(pChild);
+		this.numOfTrees = this.numOfTrees - 1 + howManySiblings;
+		this.numOfNodes = this.numOfNodes - 1;
+		// root cannot be marked, so not changing this.markedNodes
+		unmarkAndOrphanSiblings(pChild);
+		
+		if (p == pNext) {
+			this.first = pChild;
+		} else {
+			pNext.setPrev(pChild.getPrev());
+			pChild.getPrev().setNext(pNext);
+			pPrev.setNext(pChild);
+			pChild.setPrev(pPrev);
+		}
+		
+		consolidate(this);
 		
 		return;
 
+	}
+	
+	private static int calcNumberOfSiblings(HeapNode x) {
+		int count = 0;
+		HeapNode p = x;
+		do {
+			count++;
+		} while (p != x);
+		return count;
+	}
+	
+	private void recalculateMin() {
+		HeapNode p = this.first;
+		this.minNode = this.first;
+		do {
+			if (p.getKey() < this.minNode.getKey()) {
+				this.minNode = p;
+			}
+		} while (p != this.first);
 	}
 
 	/**
@@ -437,25 +480,119 @@ public class FibonacciHeap
 	 * private static void consolidate(FibonacciHeap H)
 	 * 
 	 * This function consolidates H, altering it
-	 * @complexity: O(n) // FIXME - is this the complexity?
+	 * @complexity: O(logn) // FIXME ??
 	 */
 	private static void consolidate(FibonacciHeap H)
 	{
-		// FIXME - missing implementation
-		if (H == null || H.isEmpty()) return;
+		int numOfNodes = H.numOfNodes;
+		HeapNode[] buckets = toBuckets(H);
+		FibonacciHeap newHeap = fromBuckets(buckets);
+		newHeap.copyTo(H);
+		H.numOfNodes = numOfNodes;
+	}
+	
+	private static HeapNode[] toBuckets(FibonacciHeap H) {
+		HeapNode B[];
+		
+		if (H == null || H.isEmpty()) {
+			// n == 0
+			B = new HeapNode[1];
+			B[0] = null;
+			return B;
+		}
+		
+		if (H.getFirst() == H.getFirst().getNext()) {
+			// n == 1
+			B = new HeapNode[1];
+			B[0] = H.getFirst();
+			return B;
+		}
+		
+		// n >= 2
 		
 		// we don't need to be precise with maxRank, we just need this to be LARGER than maxRank
 		// and this does it in O(1) without needing to maintain maxRank
-		int maxRank = (int) Math.ceil(Math.log10(H.numOfTrees)/Math.log10(2));
-		HeapNode rootInRank[] = new HeapNode[maxRank+1];
-		for (int i=0; i<=maxRank; i++) rootInRank[i] = null;
+		int maxRank = H.getMaxRankUpperLimit();
+		B = new HeapNode[maxRank+1];
+		for (int i=0; i<=maxRank; i++) B[i] = null;
 		
-		HeapNode p = H.getFirst();
-		HeapNode pNext;
-		HeapNode pLast = H.getLast();
-		do {
-			
-		} while (p != pLast);
+		HeapNode x, y;
+		x = H.getFirst();
+		x.getPrev().setNext(null);
+		while (x != null) {
+			y = x;
+			x = x.getNext();
+			while (B[y.getRank()] != null) {
+				y = link(y, B[y.getRank()]);
+				B[y.getRank()-1] = null;
+			}
+			B[y.getRank()] = y;
+		}
+		
+		for (int i=0; i<B.length; i++) {
+			B[i].setPrev(B[i]);
+			B[i].setNext(B[i]);
+		}
+		
+		return B;
+	}
+	
+	/**
+	 * private static void fromBuckets(HeapNode[] B)
+	 * 
+	 * This function turns a list of O(logn) buckets and turns them into a heap
+	 * Since buckets are ordered, and we iterate in decreasing order,
+	 * this results in a heap in which the lowest rank is leftmost
+	 * @complexity: O(logn) // FIXME ??
+	 */
+	private static FibonacciHeap fromBuckets(HeapNode[] B) {
+		FibonacciHeap H = new FibonacciHeap();
+		for (int i=B.length-1; i>=0; i--) {
+			if (B[i] != null) {
+				H.insertNode(B[i]);
+			}
+		}
+		return H;
+	}
+	
+	private static HeapNode link(HeapNode node1, HeapNode node2) {
+		
+		// FIXME - what happens if the trees are not perfect?
+		//         do we care?
+		
+		Logger.assertd_iff(node1 == null, node2 == null);
+		if (node1 == null || node2 == null) return null;
+		
+		Logger.assertd(node1.getRank() == node2.getRank());
+		
+		if (node1.getKey() > node2.getKey()) {
+			HeapNode tmp = node1;
+			node1 = node2;
+			node2 = tmp;
+		}
+		Logger.assertd(node1.getKey() <= node2.getKey());
+		
+		HeapNode oldChild = node1.getChild();
+		node1.setChild(node2);
+		node2.setParent(node1);
+		if (oldChild != null) {
+			if (oldChild.getNext() == oldChild) {
+				oldChild.setNext(node2);
+				oldChild.setPrev(node2);
+				node2.setPrev(oldChild);
+				node2.setNext(oldChild);
+			} else {
+				node2.setPrev(oldChild.getPrev());
+				node2.getPrev().setNext(node2);
+				oldChild.setPrev(node2);
+				node2.setNext(oldChild);
+			}
+		} else {
+			node2.setPrev(node2);
+			node2.setNext(node2);
+		}
+		
+		return node1;
 	}
 	
 	/**
@@ -489,6 +626,24 @@ public class FibonacciHeap
 	 */
 	private static double log2(double x) {
 		return Math.log10(x)/Math.log10(2);
+	}
+	
+	/**
+	 * private static double logphi(double x)
+	 * 
+	 * Returns log(x) in golden ratio base (rounded to 1.5)
+	 */
+	private static double logphi(double x) {
+		return Math.log10(x)/Math.log10(1.5);
+	}
+	
+	/**
+	 * private int getMaxRankUpperLimit()
+	 * 
+	 * Returns upper limit for maximum rank
+	 */
+	private int getMaxRankUpperLimit() {
+		return (int)Math.ceil(Math.log10(this.numOfNodes)/Math.log10(1.5));
 	}
 
 	/**
