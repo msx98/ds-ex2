@@ -61,7 +61,21 @@ public class FibonacciHeap
 	public HeapNode insert(int key)
 	{
 		HeapNode node = new HeapNode(key);
-
+		insertNode(node);
+		return node;
+	}
+	
+	/**
+	 * public HeapNode insertNode(int key)
+	 *
+	 * Creates a node (of type HeapNode) which contains the given key, and inserts it into the heap.
+	 * The added key is assumed not to already belong to the heap.
+	 *
+	 * Returns the newly created node.
+	 *
+	 * @complexity: O(1)
+	 */
+	private void insertNode(HeapNode node) {
 		if (this.isEmpty()) {
 			this.minNode = node;
 			this.first   = node;
@@ -86,8 +100,6 @@ public class FibonacciHeap
 		// update object parameters
 		numOfNodes++; // added a new node 
 		numOfTrees += 1; // this is technically a new tree
-		
-		return node;
 	}
 
 	/**
@@ -260,7 +272,7 @@ public class FibonacciHeap
 			if (x.getKey() < x.getParent().getKey()) {
 				// OH NO! We broke the Binomial Tree property!
 				// We commence the cutting
-				// FIXME - missing implementation. This is an important scenario
+				x.cascadingCut(this);
 				return;
 			} else {
 				// coolio
@@ -326,8 +338,19 @@ public class FibonacciHeap
 		return arr;
 	}
 	
+	/**
+	 * private static void unmarkAndOrphanSiblings(HeapNode first)
+	 * @param: first
+	 * @post: turns first and its siblings into poor orphans
+	 * @complexity: O(s) with n being the number of siblings of first
+	 */
 	private static void unmarkAndOrphanSiblings(HeapNode first) {
-		
+		HeapNode p = first;
+		do {
+			p.setParent(null);
+			p.setMark(false);
+			p = p.getNext();
+		} while (p != first);
 	}
 	
 	/**
@@ -554,6 +577,63 @@ public class FibonacciHeap
 		public void setMark(boolean mark) {
 			this.mark = mark;
 		}
+		
+		public void setRank(int rank) {
+			this.rank = rank;
+		}
+		
+		/**
+		 * private void cut(HeapNode x)
+		 * 
+		 * Cuts x from its parent
+		 * @param HeapNode x
+		 * @pre x.parent != null
+		 * @pre this.contains(x)
+		 * @post x.parent == null && this.treeRoots[0] == x
+		 */
+		private void cut() {
+			HeapNode x = this;
+			HeapNode y = x.getParent();
+			Logger.assertd(y != null);
+			x.setParent(null);
+			x.setMark(false);
+			y.setRank(y.getRank()-1);
+			
+			if (y.getChild() == x) {
+				if (x.getNext() == x) {
+					y.setChild(null);
+				} else {
+					y.setChild(x.getNext());
+				}
+			} else {
+				// child is ok, first child is still the first child
+			}
+			
+			Logger.assertd_iff(x.getNext() == x, x.getPrev() == x);
+			if (x.getNext() != x) {
+				// x is not its parent's only child
+				x.getPrev().setNext(x.getNext());
+				x.getNext().setPrev(x.getPrev());
+			}
+		}
+		
+		private void cascadingCut(FibonacciHeap H) {
+			HeapNode x = this;
+			HeapNode y = x.getParent();
+			
+			x.cut();
+			H.insertNode(x);
+			
+			if (y != null) {
+				if (y.getMark() == false) {
+					y.setMark(true);
+				} else {
+					y.cascadingCut(H);
+				}
+			}
+			
+		}
+		
 	}
 
 }
