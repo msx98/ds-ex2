@@ -590,8 +590,10 @@ public class FibonacciHeap
 		 * @pre x.parent != null
 		 * @pre this.contains(x)
 		 * @post x.parent == null && this.treeRoots[0] == x
+		 * @complexity O(1)
 		 */
 		private void cut() {
+			Logger.COUNT_CUTS++;
 			HeapNode x = this;
 			HeapNode y = x.getParent();
 			Logger.assertd(y != null);
@@ -617,6 +619,16 @@ public class FibonacciHeap
 			}
 		}
 		
+		/**
+		 * private void cascadingCut(HeapNode x)
+		 * 
+		 * Cuts x from its parent
+		 * @param HeapNode x
+		 * @pre x.parent != null
+		 * @pre this.contains(x)
+		 * @post x.parent == null && this.treeRoots[0] == x
+		 * @complexity O(logn) where n==H.numOfNodes
+		 */
 		private void cascadingCut(FibonacciHeap H) {
 			HeapNode x = this;
 			HeapNode y = x.getParent();
@@ -671,5 +683,5 @@ final class Logger {
 	public static int COUNT_INSERTIONS	  = 0; // FIXME - never updated
 	public static int COUNT_DELETIONS	  = 0; // FIXME - never updated
 	public static int COUNT_LINKS         = 0; // FIXME - never updated (and required)
-	public static int COUNT_CUTS          = 0; // FIXME - never updated (and required)
+	public static int COUNT_CUTS          = 0;
 }
