@@ -623,6 +623,7 @@ public class FibonacciHeap
 			
 			x.cut();
 			H.insertNode(x);
+			H.numOfNodes = H.numOfNodes - 1; // we don't actually add nodes
 			
 			if (y != null) {
 				if (y.getMark() == false) {
