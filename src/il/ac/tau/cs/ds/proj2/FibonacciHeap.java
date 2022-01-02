@@ -191,6 +191,7 @@ public class FibonacciHeap
 			Logger.assertd(this.numOfNodes  == 1);
 			Logger.assertd(this.markedNodes == 0);
 			this.first       = null;
+			this.minNode     = null;
 			this.numOfNodes  = 0;
 			this.numOfTrees  = 0;
 			this.markedNodes = 0;
@@ -918,7 +919,7 @@ public class FibonacciHeap
 			H.insertNode(x);
 			H.numOfNodes = H.numOfNodes - 1; // we don't actually add nodes
 			
-			if (y != null) {
+			if (y.getParent() != null) {
 				if (y.getMark() == false) {
 					y.setMark(true);
 				} else {
