@@ -10,7 +10,11 @@ public class FibonacciHeap
 	int numOfNodes, markedNodes, numOfTrees;
 	HeapNode minNode; // this is the node with the minimum key
 	HeapNode first; // on insertion, this shall be the newest
+	
+	static int COUNT_LINKS		= 0			;
+	static int COUNT_CUTS		= 0			;
 
+	
 	public FibonacciHeap() {
 		this.numOfNodes = 0;
 		this.markedNodes = 0;
@@ -415,7 +419,7 @@ public class FibonacciHeap
 	 */
 	public static int totalLinks()
 	{
-		return Logger.COUNT_LINKS; // FIXME - might not wanna use Logger
+		return COUNT_LINKS; // FIXME - might not wanna use Logger
 	}
 
 	/**
@@ -429,7 +433,7 @@ public class FibonacciHeap
 	 */
 	public static int totalCuts()
 	{
-		return Logger.COUNT_CUTS; // FIXME - might not wanna use Logger
+		return COUNT_CUTS; // FIXME - might not wanna use Logger
 	}
 	
 	/**
@@ -756,7 +760,7 @@ public class FibonacciHeap
 	 */
 	private static HeapNode link(HeapNode node1, HeapNode node2) {
 		
-		Logger.COUNT_LINKS += 1;
+		COUNT_LINKS += 1;
 		
 		// FIXME - what happens if the trees are not perfect?
 		//         do we care?
@@ -914,7 +918,7 @@ public class FibonacciHeap
 		 * @complexity O(1)
 		 */
 		private void cut() {
-			Logger.COUNT_CUTS++;
+			COUNT_CUTS++;
 			HeapNode x = this;
 			HeapNode y = x.getParent();
 			Logger.assertd(y != null);
@@ -1096,9 +1100,15 @@ final class Logger {
 			System.out.println(s);
 	}
 	
+	public static void reset() {
+		FibonacciHeap.COUNT_CUTS = 0;
+		FibonacciHeap.COUNT_LINKS = 0;
+		Logger.COUNT_CUTS = 0;
+		Logger.ASSERTION_TRIGGERS = 0;
+		Logger.COUNT_LINKS = 0;
+	}
+	
 	public static int ASSERTION_TRIGGERS  = 0;
-	public static int COUNT_INSERTIONS	  = 0; // FIXME - never updated
-	public static int COUNT_DELETIONS	  = 0; // FIXME - never updated
-	public static int COUNT_LINKS         = 0; // FIXME - never updated (and required)
+	public static int COUNT_LINKS         = 0;
 	public static int COUNT_CUTS          = 0;
 }

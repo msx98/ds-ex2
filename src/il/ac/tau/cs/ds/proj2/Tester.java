@@ -5,6 +5,7 @@ package il.ac.tau.cs.ds.proj2;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 
 public class Tester {
@@ -15,6 +16,11 @@ public class Tester {
   static double testScore;
 
   public static void main(String[] args) {
+	  //runAllTests();
+	  Q1.run_all();
+  }
+  
+  public static void runAllTests() {
 
       grade = 80.0;
       testScore = 64.0 / 29;
@@ -1022,4 +1028,23 @@ public class Tester {
   }
 }
 
+final class Timer {
+	
+	long timeStarted = 0;
+	Date date = new Date();
+	
+	public Timer() {
+		
+	}
+	
+	public void reset() {
+		timeStarted = new Date().getTime();
+	}
+	
+	public long split() {
+		long result = new Date().getTime() - timeStarted;
+		this.reset();
+		return result;
+	}
+}
 
