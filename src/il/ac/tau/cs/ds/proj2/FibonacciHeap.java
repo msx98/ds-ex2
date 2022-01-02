@@ -865,9 +865,12 @@ public class FibonacciHeap
 		}
 		
 		/**
-		 * private void cut(HeapNode x)
+		 * private void cut()
 		 * 
-		 * Cuts x from its parent
+		 * Cuts this from its parent
+		 * this.mark property is not modified
+		 * this.parent.mark property is not modified
+		 * 
 		 * @param HeapNode x
 		 * @pre x.parent != null
 		 * @pre this.contains(x)
@@ -880,7 +883,6 @@ public class FibonacciHeap
 			HeapNode y = x.getParent();
 			Logger.assertd(y != null);
 			x.setParent(null);
-			x.setMark(false);
 			y.setRank(y.getRank()-1);
 			
 			if (y.getChild() == x) {
@@ -916,12 +918,17 @@ public class FibonacciHeap
 			HeapNode y = x.getParent();
 			
 			x.cut();
+			if (x.isMarked()) {
+				x.setMark(false);
+				H.markedNodes--;
+			}
 			H.insertNode(x);
 			H.numOfNodes = H.numOfNodes - 1; // we don't actually add nodes
 			
 			if (y.getParent() != null) {
 				if (y.getMark() == false) {
 					y.setMark(true);
+					H.markedNodes++;
 				} else {
 					y.cascadingCut(H);
 				}

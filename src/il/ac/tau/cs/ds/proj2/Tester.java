@@ -18,40 +18,8 @@ public class Tester {
 
       grade = 80.0;
       testScore = 64.0 / 29;
-
-      test0();
-      test1();
-      test2();
-      test3();
-      test4();
-      test5();
-      test6();
-      test7();
-      test8();
-      test9();
-      test10();
-      test11();
-      test12();
-      test13();
-      test14();
-      test15();
-      test16();
-      test17();
-      test18();
-      test19();
-      test20();
-      test21();
-      test22();
-      test23();
-      test24();
-      test25();
-      test26();
-      test27();
-      test28();
-      test29();
-
       
-      /*try {
+      try {
           test0();
       } catch (Exception e) {
           bugFound(e.toString() + "\ntest0");
@@ -207,7 +175,7 @@ public class Tester {
       } catch (Exception e) {
           System.out.println("Bug found in " + "test30");
           grade -= 8;
-      }*/
+      }
 
       System.out.println("Final grade: " + String.valueOf(grade));
       
@@ -747,8 +715,12 @@ public class Tester {
 
       if (fibonacciHeap.potential() != 4 ||
               FibonacciHeap.totalCuts() - cuts != 1 ||
-              FibonacciHeap.totalLinks() - links != 3)
-          bugFound(test);
+              FibonacciHeap.totalLinks() - links != 3) {
+    	  bugFound(test);
+    	  System.out.println(String.format("val: %d", fibonacciHeap.potential()));
+    	  System.out.println(String.format("val: %d", fibonacciHeap.totalCuts()-cuts));
+    	  System.out.println(String.format("val: %d", fibonacciHeap.totalLinks()-links));
+      }
   }
 
   static void test20() {
@@ -1000,6 +972,7 @@ public class Tester {
       int[] kmin = FibonacciHeap.kMin(fibonacciHeap, 10);
       for (int i = 0; i < kmin.length; i++) {
           if (kmin[i] != i + 1) {
+        	  System.out.println("Grade reduced in test29");
               grade -= 8;
               return;
           }
