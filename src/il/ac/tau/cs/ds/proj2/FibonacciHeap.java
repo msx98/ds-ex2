@@ -93,6 +93,7 @@ public class FibonacciHeap
 	 *
 	 * Deletes the node containing the minimum key.
 	 *
+	 * @complexity: O(n)
 	 */
 	public void deleteMin()
 	{
@@ -174,6 +175,13 @@ public class FibonacciHeap
 
 	}
 	
+	/**
+	 * private static int calcNumberOfSiblings(HeapNode x)
+	 * 
+	 * Counts x and its siblings
+	 * 
+	 * @complexity: O(n) (e.g. foreach i=1 to 1000: insert without del)
+	 */
 	private static int calcNumberOfSiblings(HeapNode x) {
 		int count = 0;
 		HeapNode p = x;
@@ -183,6 +191,13 @@ public class FibonacciHeap
 		return count;
 	}
 	
+	/**
+	 * private void recalculateMin()
+	 * 
+	 * Recalculate minimum node in this
+	 * 
+	 * @complexity: O(n) (e.g. foreach i=1 to 1000: insert without del)
+	 */
 	private void recalculateMin() {
 		if (this.first == null) {
 			this.minNode = null;
@@ -220,6 +235,7 @@ public class FibonacciHeap
 	 * (lazy) melds heap2 with the current heap in order:
 	 * 		this -> heap2
 	 *
+	 * @complexity: O(1)
 	 */
 	public void meld (FibonacciHeap heap2)
 	{
@@ -311,9 +327,11 @@ public class FibonacciHeap
 	 *
 	 * Deletes the node x from the heap.
 	 * It is assumed that x indeed belongs to the heap.
+	 * 
+	 * @complexity: O(n) (max(decreaseKey, delete))
 	 *
 	 */
-	public void delete(HeapNode x) // FIXME - verify @complexity
+	public void delete(HeapNode x)
 	{
 		Logger.assertd(this.minNode != null);
 		if (this.minNode == null) return;
@@ -338,6 +356,8 @@ public class FibonacciHeap
 	 *
 	 * Decreases the key of the node x by a non-negative value delta. The structure of the heap should be updated
 	 * to reflect this change (for example, the cascading cuts procedure should be applied if needed).
+	 * 
+	 * @complexity: O(logn)
 	 */
 	public void decreaseKey(HeapNode x, int delta)
 	{
@@ -390,6 +410,8 @@ public class FibonacciHeap
 	 * run-time of the program. A link operation is the operation which gets as input two
 	 * trees of the same rank, and generates a tree of rank bigger by one, by hanging the
 	 * tree which has larger value in its root under the other tree.
+	 * 
+	 * @complexity: O(1)
 	 */
 	public static int totalLinks()
 	{
@@ -402,12 +424,21 @@ public class FibonacciHeap
 	 * This static function returns the total number of cut operations made during the
 	 * run-time of the program. A cut operation is the operation which disconnects a subtree
 	 * from its parent (during decreaseKey/delete methods).
+	 * 
+	 * @complexity: O(1)
 	 */
 	public static int totalCuts()
 	{
 		return Logger.COUNT_CUTS; // FIXME - might not wanna use Logger
 	}
 	
+	/**
+	 * private static void replaceMinInArray(HeapNode[] candidates)
+	 * 
+	 * Replaces candidates[0] with min(candidates)
+	 * 
+	 * @complexity: candidates.length == deg(H)
+	 */
 	private static void replaceMinInArray(HeapNode[] candidates) {
 		if (candidates[0] == null || candidates[1] == null) return;
 		
@@ -425,6 +456,13 @@ public class FibonacciHeap
 		}
 	}
 	
+	/**
+	 * private static void shiftLeftArr(HeapNode[] candidates)
+	 * 
+	 * Shifts left candidates
+	 * 
+	 * @complexity: candidates.length == deg(H)
+	 */
 	private static void shiftLeftArr(HeapNode[] candidates) {
 		for (int i=0; i<candidates.length-1; i++) {
 			candidates[i] = candidates[i+1];
@@ -432,6 +470,14 @@ public class FibonacciHeap
 		candidates[candidates.length-1] = null;
 	}
 	
+	/**
+	 * private static void removeAndReplaceMin(HeapNode[] candidates)
+	 * 
+	 * 1. Shifts left candidates
+	 * 2. Replaces candidates[0] with min(candidates)
+	 * 
+	 * @complexity: candidates.length == deg(H)
+	 */
 	private static void removeAndReplaceMin(HeapNode[] candidates) {
 		if (candidates[0] == null) return;
 		if (candidates[1] == null) {
@@ -443,6 +489,13 @@ public class FibonacciHeap
 		replaceMinInArray(candidates);
 	}
 	
+	/**
+	 * private static int addChildren(HeapNode[] candidates, int firstIdx, HeapNode parent)
+	 * 
+	 * Adds children of parent to candidates, starting firstIdx
+	 * 
+	 * @complexity: candidates.length == deg(H)
+	 */
 	private static int addChildren(HeapNode[] candidates, int firstIdx, HeapNode parent) {
 		HeapNode p = parent.getChild();
 		if (p == null) return 0;
@@ -496,7 +549,6 @@ public class FibonacciHeap
 			nextMin = candidates[0];
 			removeAndReplaceMin(candidates);
 			kMinElements[kNextMinIdx] = nextMin.getKey();
-			//removeAndReplaceMin(candidates);
 			candidatesTopIdx--;
 			candidatesTopIdx += addChildren(candidates, candidatesTopIdx, nextMin);
 			kNextMinIdx++;
@@ -605,7 +657,7 @@ public class FibonacciHeap
 	 * private static void consolidate(FibonacciHeap H)
 	 * 
 	 * This function consolidates H, altering it
-	 * @complexity: O(logn) // FIXME ??
+	 * @complexity: same as toBuckets
 	 */
 	private static void consolidate(FibonacciHeap H)
 	{
@@ -620,6 +672,14 @@ public class FibonacciHeap
 		H.numOfNodes = numOfNodes;
 	}
 	
+	/**
+	 * private static HeapNode[] toBuckets(FibonacciHeap H)
+	 * 
+	 * Divides heap H into logn buckets
+	 * Bucket no. k contains one tree of rank k
+	 * 
+	 * @complexity: O(logn) // FIXME
+	 */
 	private static HeapNode[] toBuckets(FibonacciHeap H) {
 		HeapNode B[];
 		
@@ -673,7 +733,7 @@ public class FibonacciHeap
 	 * This function turns a list of O(logn) buckets and turns them into a heap
 	 * Since buckets are ordered, and we iterate in decreasing order,
 	 * this results in a heap in which the lowest rank is leftmost
-	 * @complexity: O(logn) // FIXME ??
+	 * @complexity: O(logn)
 	 */
 	private static FibonacciHeap fromBuckets(HeapNode[] B) {
 		FibonacciHeap H = new FibonacciHeap();
@@ -685,6 +745,15 @@ public class FibonacciHeap
 		return H;
 	}
 	
+	/**
+	 * private static HeapNode link(HeapNode node1, HeapNode node2)
+	 * 
+	 * Links node1 and node2
+	 * 
+	 * @pre: node1.rank == node2.rank
+	 * @complexity: O(1)
+	 * @return: new root of joined trees
+	 */
 	private static HeapNode link(HeapNode node1, HeapNode node2) {
 		
 		Logger.COUNT_LINKS += 1;
@@ -730,51 +799,11 @@ public class FibonacciHeap
 	}
 	
 	/**
-	 * private static HeapNode joinTwoRoots(HeapNode node1, HeapNode node2)
-	 * 
-	 * @pre: node1.rank == node2.rank
-	 * @pre: node*.prev == node*.next == node*.parent == null 
-	 * @pre: node* != null
-	 * @post: new root
-	 */
-	private static HeapNode joinTwoRoots(HeapNode node1, HeapNode node2) {
-		Logger.assertd(node1.rank == node2.rank);
-		Logger.assertd(node1.prev == null && node1.next == null && node1.parent == null);
-		Logger.assertd(node2.prev == null && node2.next == null && node2.parent == null);
-		Logger.assertd(node1 != null && node2 != null);
-		
-		HeapNode newRoot  = (node1.getKey() < node2.getKey())? node1 :node2;
-		HeapNode newChild = (node1.getKey() < node2.getKey())? node2 :node1;
-		
-		if (newRoot.getChild() == null) {
-			
-		}
-		
-		return newRoot;
-	}
-	
-	/**
-	 * private static double log2(double x)
-	 * 
-	 * Returns log(x) in base 2
-	 */
-	private static double log2(double x) {
-		return Math.log10(x)/Math.log10(2);
-	}
-	
-	/**
-	 * private static double logphi(double x)
-	 * 
-	 * Returns log(x) in golden ratio base (rounded to 1.5)
-	 */
-	private static double logphi(double x) {
-		return Math.log10(x)/Math.log10(1.5);
-	}
-	
-	/**
 	 * private int getMaxRankUpperLimit()
 	 * 
 	 * Returns upper limit for maximum rank
+	 * 
+	 * @complexity: O(1)
 	 */
 	private int getMaxRankUpperLimit() {
 		return (int)Math.ceil(Math.log10(this.numOfNodes)/Math.log10(1.5));
