@@ -482,9 +482,9 @@ public class FibonacciHeap
 		kMinElements[0] = p.getKey();
 		if (k == 1) return kMinElements;
 		
-		// FIXME should be c*H.first.getRank()+d somehow
-		
-		HeapNode[] candidates = new HeapNode[H.size()];
+		// NOTE: if this doesnt work, try maybe increasing H.first.getRank
+		// to H.numOfNodes?
+		HeapNode[] candidates = new HeapNode[H.first.getRank()];
 		int candidatesTopIdx = 0;
 		
 		candidates[candidatesTopIdx] = H.first;
