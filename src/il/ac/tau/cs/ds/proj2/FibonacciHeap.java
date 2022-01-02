@@ -10,81 +10,6 @@ public class FibonacciHeap
 	int numOfNodes, markedNodes, numOfTrees;
 	HeapNode minNode; // this is the node with the minimum key
 	HeapNode first; // on insertion, this shall be the newest
-	
-	private void assertNumOfTrees() {
-		if (this.first == null) {
-			Logger.assertd(this.numOfTrees == 0);
-			return;
-		}
-		
-		HeapNode p = this.first;
-		int counter = 0;
-		do {
-			counter++;
-			p = p.getNext();
-		} while (p != this.first);
-		Logger.assertd(this.numOfTrees == counter);
-	}
-	
-	private void assertIsEmpty() {
-		Logger.assertd_iff(this.isEmpty(), this.size() == 0, this.numOfNodes==0,
-				this.numOfTrees==0, this.minNode==null, this.first==null);
-	}
-	
-	private int debugSizeTreeAndAssertHeapProperty(HeapNode p) {
-		int subSize = 0;
-		if (p == null) return subSize;
-		subSize += 1;
-		
-		HeapNode pChild = p.getChild();
-		if (pChild == null) return subSize;
-		
-		HeapNode pFirstChild = pChild;
-		do {
-			Logger.assertd(p.getKey() <= pChild.getKey());
-			subSize += debugSizeTreeAndAssertHeapProperty(pChild);
-			pChild = pChild.getNext();
-		} while (pChild != pFirstChild);
-		return subSize;
-	}
-	
-	private int debugSizeAndAssertHeapProperty() {
-		if (this.first == null) {
-			Logger.assertd(this.isEmpty());
-			assertIsEmpty();
-			return 0;
-		}
-		
-		int subSize = 0;
-		HeapNode p = this.first;
-		do {
-			subSize += debugSizeTreeAndAssertHeapProperty(p);
-			p = p.getNext();
-		} while (p != this.first);
-		
-		Logger.assertd(this.numOfNodes == subSize);
-		return subSize;
-	}
-	
-	private void assertValidMinNode() {
-		if (this.minNode == null) {
-			Logger.assertd(this.isEmpty());
-			assertIsEmpty();
-			return;
-		}
-
-		HeapNode p = this.minNode;
-		do {
-			Logger.assertd(p.getKey() >= this.minNode.getKey());
-		} while (p != this.minNode);
-	}
-	
-	private void assertFibonacciHeap() {
-		assertIsEmpty();
-		assertNumOfTrees();
-		debugSizeAndAssertHeapProperty();
-		assertValidMinNode();
-	}
 
 	public FibonacciHeap() {
 		this.numOfNodes = 0;
@@ -482,6 +407,58 @@ public class FibonacciHeap
 	{
 		return Logger.COUNT_CUTS; // FIXME - might not wanna use Logger
 	}
+	
+	private static void replaceMinInArray(HeapNode[] candidates) {
+		if (candidates[0] == null || candidates[1] == null) return;
+		
+		int minIdx = 0;
+		for (int i=1; i<candidates.length&&candidates[i]!=null; i++) {
+			if (candidates[i].getKey() < candidates[minIdx].getKey()) {
+				minIdx = i;
+			}
+		}
+		
+		if (minIdx != 0) {
+			HeapNode tmp = candidates[0];
+			candidates[0] = candidates[minIdx];
+			candidates[minIdx] = tmp;
+		}
+	}
+	
+	private static void shiftLeftArr(HeapNode[] candidates) {
+		for (int i=0; i<candidates.length-1; i++) {
+			candidates[i] = candidates[i+1];
+		}
+		candidates[candidates.length-1] = null;
+	}
+	
+	private static void removeAndReplaceMin(HeapNode[] candidates) {
+		if (candidates[0] == null) return;
+		if (candidates[1] == null) {
+			candidates[0] = null;
+			return;
+		}
+		
+		shiftLeftArr(candidates);
+		replaceMinInArray(candidates);
+	}
+	
+	private static int addChildren(HeapNode[] candidates, int firstIdx, HeapNode parent) {
+		HeapNode p = parent.getChild();
+		if (p == null) return 0;
+		HeapNode pFirst = p;
+		
+		int idx=0;
+		do {
+			candidates[firstIdx+idx] = p;
+			idx++;
+			p = p.getNext();
+		} while (p != pFirst);
+		
+		replaceMinInArray(candidates);
+		
+		return idx;
+	}
 
 	/**
 	 * public static int[] kMin(FibonacciHeap H, int k)
@@ -490,12 +467,42 @@ public class FibonacciHeap
 	 * The function should run in O(k*deg(H)). (deg(H) is the degree of the only tree in H.)
 	 *
 	 * ###CRITICAL### : you are NOT allowed to change H.
+	 * 
+	 * @pre: foreach node in H, deg(node) <= deg(H)
+	 * @complexity: O(k*deg(H))
 	 */
 	public static int[] kMin(FibonacciHeap H, int k)
 	{
-		// FIXME - missing implementation
-		int[] arr = new int[100];
-		return arr;
+		if (k > H.numOfNodes) k = H.numOfNodes; // forum post advises this
+		if (H.numOfNodes == 0) return new int[0];
+		Logger.assertd(H.numOfTrees == 1);
+		
+		int[] kMinElements = new int[k];
+		HeapNode p = H.first;
+		kMinElements[0] = p.getKey();
+		if (k == 1) return kMinElements;
+		
+		// FIXME should be c*H.first.getRank()+d somehow
+		
+		HeapNode[] candidates = new HeapNode[H.size()];
+		int candidatesTopIdx = 0;
+		
+		candidates[candidatesTopIdx] = H.first;
+		candidatesTopIdx++;
+		
+		int kNextMinIdx = 0;
+		HeapNode nextMin, nextMinFirstChild, nextMinChild;
+		while (kNextMinIdx < k) {
+			nextMin = candidates[0];
+			removeAndReplaceMin(candidates);
+			kMinElements[kNextMinIdx] = nextMin.getKey();
+			//removeAndReplaceMin(candidates);
+			candidatesTopIdx--;
+			candidatesTopIdx += addChildren(candidates, candidatesTopIdx, nextMin);
+			kNextMinIdx++;
+		}
+		
+		return kMinElements;
 	}
 	
 	/**
@@ -936,6 +943,98 @@ public class FibonacciHeap
 			
 		}
 		
+	}
+	
+	
+	/**
+	 * DEBUG METHODS
+	 * 
+	 * These are disabled if not debugging
+	 */
+	
+	private void assertNumOfTrees() {
+		if (Logger.FLAG_DEBUG == false) return;
+		if (this.first == null) {
+			Logger.assertd(this.numOfTrees == 0);
+			return;
+		}
+		
+		HeapNode p = this.first;
+		int counter = 0;
+		do {
+			counter++;
+			p = p.getNext();
+		} while (p != this.first);
+		Logger.assertd(this.numOfTrees == counter);
+	}
+	
+	private void assertIsEmpty() {
+		if (Logger.FLAG_DEBUG == false) return;
+		Logger.assertd_iff(this.isEmpty(), this.size() == 0, this.numOfNodes==0,
+				this.numOfTrees==0, this.minNode==null, this.first==null);
+	}
+	
+	private int debugSizeTreeAndAssertHeapProperty(HeapNode p) {
+		if (Logger.FLAG_DEBUG == false) {
+			System.out.println("WARNING: Used debug method when not debugging");
+			return -1;
+		}
+		
+		int subSize = 0;
+		if (p == null) return subSize;
+		subSize += 1;
+		
+		HeapNode pChild = p.getChild();
+		if (pChild == null) return subSize;
+		
+		HeapNode pFirstChild = pChild;
+		do {
+			Logger.assertd(p.getKey() <= pChild.getKey());
+			subSize += debugSizeTreeAndAssertHeapProperty(pChild);
+			pChild = pChild.getNext();
+		} while (pChild != pFirstChild);
+		return subSize;
+	}
+	
+	private int debugSizeAndAssertHeapProperty() {
+		if (Logger.FLAG_DEBUG == false) return this.numOfNodes;
+		if (this.first == null) {
+			Logger.assertd(this.isEmpty());
+			assertIsEmpty();
+			return 0;
+		}
+		
+		int subSize = 0;
+		HeapNode p = this.first;
+		do {
+			subSize += debugSizeTreeAndAssertHeapProperty(p);
+			p = p.getNext();
+		} while (p != this.first);
+		
+		Logger.assertd(this.numOfNodes == subSize);
+		return subSize;
+	}
+	
+	private void assertValidMinNode() {
+		if (Logger.FLAG_DEBUG == false) return;
+		if (this.minNode == null) {
+			Logger.assertd(this.isEmpty());
+			assertIsEmpty();
+			return;
+		}
+
+		HeapNode p = this.minNode;
+		do {
+			Logger.assertd(p.getKey() >= this.minNode.getKey());
+		} while (p != this.minNode);
+	}
+	
+	private void assertFibonacciHeap() {
+		if (Logger.FLAG_DEBUG == false) return;
+		assertIsEmpty();
+		assertNumOfTrees();
+		debugSizeAndAssertHeapProperty();
+		assertValidMinNode();
 	}
 
 }

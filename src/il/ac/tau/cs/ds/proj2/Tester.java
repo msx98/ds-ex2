@@ -167,9 +167,10 @@ public class Tester {
       try {
           test29();
       } catch (Exception e) {
-          System.out.println("Bug found in " + "test29");
+          System.out.println(e.toString() + "\nBug found in " + "test29");
           grade -= 8;
       }
+      test29();
       try {
           //test30();
       } catch (Exception e) {
