@@ -12,7 +12,18 @@ public class FibonacciHeap
 	HeapNode first; // on insertion, this shall be the newest
 	
 	private void assertNumOfTrees() {
-		// FIXME - missing implementation
+		if (this.first == null) {
+			Logger.assertd(this.numOfTrees == 0);
+			return;
+		}
+		
+		HeapNode p = this.first;
+		int counter = 0;
+		do {
+			counter++;
+			p = p.getNext();
+		} while (p != this.first);
+		Logger.assertd(this.numOfTrees == counter);
 	}
 	
 	private void assertIsEmpty() {
@@ -20,9 +31,59 @@ public class FibonacciHeap
 				this.numOfTrees==0, this.minNode==null, this.first==null);
 	}
 	
-	private void assertSanity() {
+	private int debugSizeTreeAndAssertHeapProperty(HeapNode p) {
+		int subSize = 0;
+		if (p == null) return subSize;
+		subSize += 1;
+		
+		HeapNode pChild = p.getChild();
+		if (pChild == null) return subSize;
+		
+		HeapNode pFirstChild = pChild;
+		do {
+			Logger.assertd(p.getKey() <= pChild.getKey());
+			subSize += debugSizeTreeAndAssertHeapProperty(pChild);
+			pChild = pChild.getNext();
+		} while (pChild != pFirstChild);
+		return subSize;
+	}
+	
+	private int debugSizeAndAssertHeapProperty() {
+		if (this.first == null) {
+			Logger.assertd(this.isEmpty());
+			assertIsEmpty();
+			return 0;
+		}
+		
+		int subSize = 0;
+		HeapNode p = this.first;
+		do {
+			subSize += debugSizeTreeAndAssertHeapProperty(p);
+			p = p.getNext();
+		} while (p != this.first);
+		
+		Logger.assertd(this.numOfNodes == subSize);
+		return subSize;
+	}
+	
+	private void assertValidMinNode() {
+		if (this.minNode == null) {
+			Logger.assertd(this.isEmpty());
+			assertIsEmpty();
+			return;
+		}
+
+		HeapNode p = this.minNode;
+		do {
+			Logger.assertd(p.getKey() >= this.minNode.getKey());
+		} while (p != this.minNode);
+	}
+	
+	private void assertFibonacciHeap() {
 		assertIsEmpty();
 		assertNumOfTrees();
+		debugSizeAndAssertHeapProperty();
+		assertValidMinNode();
 	}
 
 	public FibonacciHeap() {
@@ -110,7 +171,6 @@ public class FibonacciHeap
 	 */
 	public void deleteMin()
 	{
-		// FIXME - missing implementation
 		Logger.assertd(!this.isEmpty());
 		if (this.isEmpty()) return;
 		HeapNode p = this.minNode;
@@ -119,24 +179,70 @@ public class FibonacciHeap
 		HeapNode pChild = p.getChild();
 		Logger.assertd_iff(p==pNext,p==pPrev);
 		
-		if (pChild == null) return;
+		// can the following logic be simplified?
+		// absolutely!
+		// but thankfully we live in 2021+1
+		// and i trust the java interpreter more than my own
 		
-		int howManySiblings = calcNumberOfSiblings(pChild);
-		this.numOfTrees = this.numOfTrees - 1 + howManySiblings;
-		this.numOfNodes = this.numOfNodes - 1;
-		// root cannot be marked, so not changing this.markedNodes
-		unmarkAndOrphanSiblings(pChild);
-		
-		if (p == pNext) {
+		if (p == pNext && pChild == null) {
+			// this is the only node in the world
+			// just empty the heap
+			Logger.assertd(this.numOfTrees  == 1);
+			Logger.assertd(this.numOfNodes  == 1);
+			Logger.assertd(this.markedNodes == 0);
+			this.first       = null;
+			this.numOfNodes  = 0;
+			this.numOfTrees  = 0;
+			this.markedNodes = 0;
+			return;
+		} else
+		if (p == pNext && pChild != null) {
+			// this is the only tree in the heap
+			// do what you gotta do
+			Logger.assertd(this.numOfTrees  == 1);
+			Logger.assertd(this.markedNodes == 0);
+			unmarkAndOrphanSiblings(pChild);
 			this.first = pChild;
-		} else {
+			this.numOfNodes  = this.numOfNodes - 1;
+			this.numOfTrees  = calcNumberOfSiblings(pChild);
+			this.markedNodes = 0;
+		} else
+		if (p != pNext && pChild == null) {
+			// not the only tree and not the only node
+			// but it has no child
+			// so remove it from the list
+			Logger.assertd(p.getMark() == false);
+			if (p == this.first) {
+				this.first = pNext;
+			}
+			pPrev.setNext(pNext);
+			pNext.setPrev(pPrev);
+			this.numOfNodes = this.numOfNodes - 1;
+			this.numOfTrees = this.numOfTrees - 1;
+			// this.markedNodes does not change bc root is unmarked
+		} else
+		if (p != pNext && pChild != null) {
+			int howManySiblings = calcNumberOfSiblings(pChild);
+			this.numOfTrees = this.numOfTrees - 1 + howManySiblings;
+			this.numOfNodes = this.numOfNodes - 1;
+			// root cannot be marked, so not changing this.markedNodes
+			
+			unmarkAndOrphanSiblings(pChild);
+	
 			pNext.setPrev(pChild.getPrev());
 			pChild.getPrev().setNext(pNext);
 			pPrev.setNext(pChild);
 			pChild.setPrev(pPrev);
+			
+			if (p == this.first) {
+				this.first = pNext;
+			}
 		}
 		
+		recalculateMin();
 		consolidate(this);
+		
+		this.assertFibonacciHeap();
 		
 		return;
 
@@ -152,6 +258,15 @@ public class FibonacciHeap
 	}
 	
 	private void recalculateMin() {
+		if (this.first == null) {
+			this.minNode = null;
+			return;
+		}
+		if (this.first == this.first.getNext()) {
+			this.minNode = this.first;
+			return;
+		}
+		
 		HeapNode p = this.first;
 		this.minNode = this.first;
 		do {
@@ -228,6 +343,7 @@ public class FibonacciHeap
 	 */
 	public int size()
 	{
+		//assertFibonacciHeap();
 		return this.numOfNodes;
 	}
 
@@ -387,10 +503,11 @@ public class FibonacciHeap
 	 * @post: turns first and its siblings into poor orphans
 	 * @complexity: O(s) with n being the number of siblings of first
 	 */
-	private static void unmarkAndOrphanSiblings(HeapNode first) {
+	private void unmarkAndOrphanSiblings(HeapNode first) {
 		HeapNode p = first;
 		do {
 			p.setParent(null);
+			if (p.isMarked()) this.markedNodes--;
 			p.setMark(false);
 			p = p.getNext();
 		} while (p != first);
@@ -484,7 +601,11 @@ public class FibonacciHeap
 	 */
 	private static void consolidate(FibonacciHeap H)
 	{
-		int numOfNodes = H.numOfNodes;
+		int numOfNodes = H.size();
+		if (numOfNodes == 0) {
+			Logger.assertd(H.isEmpty());
+			return;
+		}
 		HeapNode[] buckets = toBuckets(H);
 		FibonacciHeap newHeap = fromBuckets(buckets);
 		newHeap.copyTo(H);
@@ -530,6 +651,7 @@ public class FibonacciHeap
 		}
 		
 		for (int i=0; i<B.length; i++) {
+			if (B[i] == null) continue;
 			B[i].setPrev(B[i]);
 			B[i].setNext(B[i]);
 		}
@@ -556,6 +678,8 @@ public class FibonacciHeap
 	}
 	
 	private static HeapNode link(HeapNode node1, HeapNode node2) {
+		
+		Logger.COUNT_LINKS += 1;
 		
 		// FIXME - what happens if the trees are not perfect?
 		//         do we care?
@@ -591,6 +715,8 @@ public class FibonacciHeap
 			node2.setPrev(node2);
 			node2.setNext(node2);
 		}
+		
+		node1.setRank(node1.getRank()+1);
 		
 		return node1;
 	}

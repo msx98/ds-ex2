@@ -19,150 +19,182 @@ public class Tester {
       grade = 80.0;
       testScore = 64.0 / 29;
 
-      try {
+      test0();
+      test1();
+      test2();
+      test3();
+      test4();
+      test5();
+      test6();
+      test7();
+      test8();
+      test9();
+      test10();
+      test11();
+      test12();
+      test13();
+      test14();
+      test15();
+      test16();
+      test17();
+      test18();
+      test19();
+      test20();
+      test21();
+      test22();
+      test23();
+      test24();
+      test25();
+      test26();
+      test27();
+      test28();
+      test29();
+
+      
+      /*try {
           test0();
       } catch (Exception e) {
-          bugFound("test0");
+          bugFound(e.toString() + "\ntest0");
       }
       try {
           test1();
       } catch (Exception e) {
-          bugFound("test1");
+          bugFound(e.toString() + "\ntest1");
       }
       try {
           test2();
       } catch (Exception e) {
-          bugFound("test2");
+          bugFound(e.toString() + "\ntest2");
       }
       try {
           test3();
       } catch (Exception e) {
-          bugFound("test3");
+          bugFound(e.toString() + "\ntest3");
       }
       try {
           test4();
       } catch (Exception e) {
-          bugFound("test4");
+          bugFound(e.toString() + "\ntest4");
       }
       try {
           //test5();
       } catch (Exception e) {
-          bugFound("test5");
+          bugFound(e.toString() + "\ntest5");
       }
       try {
           //test6();
       } catch (Exception e) {
-          bugFound("test6");
+          bugFound(e.toString() + "\ntest6");
       }
       try {
           test7();
       } catch (Exception e) {
-          bugFound("test7");
+          bugFound(e.toString() + "\ntest7");
       }
       try {
           test8();
       } catch (Exception e) {
-          bugFound("test8");
+          bugFound(e.toString() + "\ntest8");
       }
       try {
           test9();
       } catch (Exception e) {
-          bugFound("test9");
+          bugFound(e.toString() + "\ntest9");
       }
       try {
           test10();
       } catch (Exception e) {
-          bugFound("test10");
+          bugFound(e.toString() + "\ntest10");
       }
       try {
           test11();
       } catch (Exception e) {
-          bugFound("test11");
+          bugFound(e.toString() + "\ntest11");
       }
       try {
           test12();
       } catch (Exception e) {
-          bugFound("test12");
+          bugFound(e.toString() + "\ntest12");
       }
       try {
           test13();
       } catch (Exception e) {
-          bugFound("test13");
+          bugFound(e.toString() + "\ntest13");
       }
       try {
           test14();
       } catch (Exception e) {
-          bugFound("test14");
+          bugFound(e.toString() + "\ntest14");
       }
       try {
           test15();
       } catch (Exception e) {
-          bugFound("test15");
+          bugFound(e.toString() + "\ntest15");
       }
       try {
           test16();
       } catch (Exception e) {
-          bugFound("test16");
+          bugFound(e.toString() + "\ntest16");
       }
       try {
           test17();
       } catch (Exception e) {
-          bugFound("test17");
+          bugFound(e.toString() + "\ntest17");
       }
       try {
           test18();
       } catch (Exception e) {
-          bugFound("test18");
+          bugFound(e.toString() + "\ntest18");
       }
       try {
           test19();
       } catch (Exception e) {
-          bugFound("test19");
+          bugFound(e.toString() + "\ntest19");
       }
       try {
           test20();
       } catch (Exception e) {
-          bugFound("test20");
+          bugFound(e.toString() + "\ntest20");
       }
       try {
           test21();
       } catch (Exception e) {
-          bugFound("test21");
+          bugFound(e.toString() + "\ntest21");
       }
       try {
           test22();
       } catch (Exception e) {
-          bugFound("test22");
+          bugFound(e.toString() + "\ntest22");
       }
       try {
           test23();
       } catch (Exception e) {
-          bugFound("test23");
+          bugFound(e.toString() + "\ntest23");
       }
       try {
           test24();
       } catch (Exception e) {
-          bugFound("test24");
+          bugFound(e.toString() + "\ntest24");
       }
       try {
           test25();
       } catch (Exception e) {
-          bugFound("test25");
+          bugFound(e.toString() + "\ntest25");
       }
       try {
           test26();
       } catch (Exception e) {
-          bugFound("test26");
+          bugFound(e.toString() + "\ntest26");
       }
       try {
           test27();
       } catch (Exception e) {
-          bugFound("test27");
+          bugFound(e.toString() + "\ntest27");
       }
       try {
           test28();
       } catch (Exception e) {
-          bugFound("test28");
+          bugFound(e.toString() + "\ntest28");
       }
       try {
           test29();
@@ -175,7 +207,7 @@ public class Tester {
       } catch (Exception e) {
           System.out.println("Bug found in " + "test30");
           grade -= 8;
-      }
+      }*/
 
       System.out.println("Final grade: " + String.valueOf(grade));
       
@@ -199,7 +231,8 @@ public class Tester {
       }
 
       for (int i = 0; i < 5; i++) {
-          if (fibonacciHeap.findMin().getKey() != i) {
+    	  int minVal = fibonacciHeap.findMin().getKey();
+          if (minVal != i) {
               bugFound(test);
               return;
           }
