@@ -32,8 +32,7 @@ public class FibonacciHeap
 	{
 		boolean result = this.minNode == null;
 		
-		Logger.assertd_iff(result, this.size() == 0, this.numOfNodes==0,
-				this.numOfTrees==0, this.minNode==null, this.first==null);
+		assertIsEmpty();
 		
 		return result;
 	}
@@ -42,7 +41,7 @@ public class FibonacciHeap
 	 * public HeapNode insert(int key)
 	 *
 	 * Creates a node (of type HeapNode) which contains the given key, and inserts it into the heap.
-	 * The added key is assumed not to already belong to the heap.
+	 * The added key is assumed not to already belo ng to the heap.
 	 *
 	 * Returns the newly created node.
 	 *
@@ -1003,7 +1002,7 @@ public class FibonacciHeap
 	
 	private void assertIsEmpty() {
 		if (Logger.FLAG_DEBUG == false) return;
-		Logger.assertd_iff(this.isEmpty(), this.size() == 0, this.numOfNodes==0,
+		Logger.assertd_iff(this.size() == 0, this.numOfNodes==0,
 				this.numOfTrees==0, this.minNode==null, this.first==null);
 	}
 	
@@ -1075,8 +1074,8 @@ public class FibonacciHeap
 
 final class Logger {
 	private Logger() {}
-	public static final boolean FLAG_DEBUG   = true; // FIXME - change to false before assignment
-	public static final boolean FLAG_VERBOSE = true; // FIXME - change to false before assignment
+	public static final boolean FLAG_DEBUG   = false; // FIXME - change to false before assignment
+	public static final boolean FLAG_VERBOSE = false; // FIXME - change to false before assignment
 	
 	public static void assertd(boolean condition) {
 		if (FLAG_DEBUG) {

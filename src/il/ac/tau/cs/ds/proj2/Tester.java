@@ -17,7 +17,11 @@ public class Tester {
 
   public static void main(String[] args) {
 	  //runAllTests();
-	  Q1.run_all();
+	  Q1.run();
+	  System.out.println();
+	  System.out.println();
+	  System.out.println();
+	  Q2.run();
   }
   
   public static void runAllTests() {
