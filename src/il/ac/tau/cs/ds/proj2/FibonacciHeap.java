@@ -96,7 +96,7 @@ public class FibonacciHeap
 	 *
 	 * Deletes the node containing the minimum key.
 	 *
-	 * @complexity: O(n)
+	 * @complexity: O(this.numOfTrees + log(this.numOfNodes))
 	 */
 	public void deleteMin()
 	{
@@ -331,7 +331,7 @@ public class FibonacciHeap
 	 * Deletes the node x from the heap.
 	 * It is assumed that x indeed belongs to the heap.
 	 * 
-	 * @complexity: O(n) (max(decreaseKey, delete))
+	 * @complexity: O(this.numOfTrees+log2(this.numOfNodes)) (max(decreaseKey, deleteMin))
 	 *
 	 */
 	public void delete(HeapNode x)
@@ -360,14 +360,18 @@ public class FibonacciHeap
 	 * Decreases the key of the node x by a non-negative value delta. The structure of the heap should be updated
 	 * to reflect this change (for example, the cascading cuts procedure should be applied if needed).
 	 * 
-	 * @complexity: O(logn)
+	 * @complexity: O(cuts) == O(logn)
 	 */
 	public void decreaseKey(HeapNode x, int delta)
 	{
 		Logger.assertd(delta >= 0);
 		Logger.assertd(Integer.MIN_VALUE <= x.key-delta && x.key-delta <= Integer.MAX_VALUE);
+		if (((long)x.key - (long)delta) < Integer.MIN_VALUE) {
+			x.key = Integer.MIN_VALUE;
+		} else {
+			x.key = x.key-delta;
+		}
 		
-		x.key = x.key-delta;
 		if (x.getParent() == null) {
 			if (x.getKey() < this.minNode.getKey()) {
 				this.minNode = x;
