@@ -135,7 +135,6 @@ public class FibonacciHeap
 			this.first = pChild;
 			this.numOfNodes  = this.numOfNodes - 1;
 			this.numOfTrees  = calcNumberOfSiblings(pChild);
-			this.markedNodes = 0;
 		} else
 		if (p != pNext && pChild == null) {
 			// not the only tree and not the only node
@@ -372,14 +371,12 @@ public class FibonacciHeap
 			x.key = x.key-delta;
 		}
 		
+		if (x.getKey() < this.minNode.getKey()) {
+			this.minNode = x;
+		}
+		
 		if (x.getParent() == null) {
-			if (x.getKey() < this.minNode.getKey()) {
-				this.minNode = x;
-				return;
-			} else {
-				// aight
-				return;
-			}
+			return;
 		} else {
 			if (x.getKey() < x.getParent().getKey()) {
 				// OH NO! We broke the Binomial Tree property!
@@ -669,6 +666,7 @@ public class FibonacciHeap
 	private static void consolidate(FibonacciHeap H)
 	{
 		int numOfNodes = H.size();
+		int markedNodes = H.markedNodes;
 		if (numOfNodes == 0) {
 			Logger.assertd(H.isEmpty());
 			return;
@@ -677,6 +675,7 @@ public class FibonacciHeap
 		FibonacciHeap newHeap = fromBuckets(buckets);
 		newHeap.copyTo(H);
 		H.numOfNodes = numOfNodes;
+		H.markedNodes = markedNodes;
 	}
 	
 	/**

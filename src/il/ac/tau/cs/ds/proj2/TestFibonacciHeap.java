@@ -46,6 +46,24 @@ public class TestFibonacciHeap {
 
         return l;
     }
+    
+    public static boolean isOrdered(int[] inputs) {
+    	for (int i=0; i<inputs.length; i++) {
+    		if (inputs[i] != i) return false;
+    	}
+    	return true;
+    }
+    
+    public static boolean isReversed(int[] inputs) {
+    	for (int i=0; i<inputs.length; i++) {
+    		if (inputs[i] != inputs.length-1-i) return false;
+    	}
+    	return true;
+    }
+    
+    public static boolean isShuffled(int[] inputs) {
+    	return !isOrdered(inputs) && !isReversed(inputs);
+    }
 
     public static void main(String[] args) {
         initRandom(42);
@@ -58,9 +76,9 @@ public class TestFibonacciHeap {
             System.out.printf("Inserts for i=%d passed%n", i);
             insertionDeleMinTester(shuffled);
             System.out.printf("Inserts/DeleteMins shuffled for i=%d passed%n", i);
-            insertionDeleMinTester(shuffled);
-            System.out.printf("Inserts/DeleteMins oredered for i=%d passed%n", i);
             insertionDeleMinTester(ordered);
+            System.out.printf("Inserts/DeleteMins oredered for i=%d passed%n", i);
+            insertionDeleMinTester(reversed);
             System.out.printf("Inserts/DeleteMins reversed for i=%d passed%n", i);
             insertionDeletionTester(reversed);
             System.out.printf("Inserts/Deletes shuffled for i=%d passed%n", i);
@@ -348,7 +366,10 @@ public class TestFibonacciHeap {
         HeapStats expectedS2 = getExpectedDeleteMinStats(node, s1);
         h.deleteMin();
         HeapStats s2 = new HeapStats(h);
-        failIf(!s2.equals(expectedS2), "Error in stats");
+        if (!s2.equals(expectedS2)) {
+        	System.out.println("PROBLEMO!");
+        }
+        failIf(!s2.equals(expectedS2), String.format("verifiedDeleteMin - Error in stats\nstats=%s\nexpected=%s",s2.toString(),expectedS2.toString()));
     }
 
     private static void verifiedDeleteMin(FibonacciHeap h, boolean verify) {
@@ -401,7 +422,7 @@ public class TestFibonacciHeap {
         HeapStats expectedS2 = getExpectedDecreaseKeyStats(node, s1);
         h.decreaseKey(node, Integer.MAX_VALUE);
         HeapStats s2 = new HeapStats(h);
-        failIf(!s2.equals(expectedS2), "Error in stats");
+        failIf(!s2.equals(expectedS2), "verifiedDelete - Error in stats");
         verifiedDeleteMin(h);
     }
 
@@ -475,10 +496,16 @@ public class TestFibonacciHeap {
         HashMap<Integer, FibonacciHeap.HeapNode> nodeByKey = new HashMap<>();
 
         failIf(commands.size() != 2 * n, "Bug in command creation");
+        
+        for (int i=0; i<commands.size(); i++) {
+        	DictCommand c = commands.get(i);
+        	//System.out.println(String.format("%d: %s %d", i, c.insert?"INS":"DEL", c.key));
+        }
 
         int maxHeapSize = 0;
         for (int i = 0; i < commands.size(); i++) {
             DictCommand c = commands.get(i);
+            //System.out.println("Executing command " + String.valueOf(i));
             if (c.insert) {
                 FibonacciHeap.HeapNode node = verifiedInsert(h, c.key);
                 maxHeapSize = Math.max(maxHeapSize, h.size());
@@ -567,6 +594,13 @@ class HeapStats {
         int result = Objects.hash(totalCuts, totalLinks, potential);
         result = 31 * result + Arrays.hashCode(counters);
         return result;
+    }
+    
+    @Override
+    public String toString() {
+    	String s = "";
+    	s += String.format("totalCuts=%d, totalLinks=%d, potential=%s, counters=%s", totalCuts, totalLinks, potential, Arrays.toString(counters));
+    	return s;
     }
 }
 
