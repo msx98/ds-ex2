@@ -43,7 +43,7 @@ public class Q2 {
 		
 		
 		long pace = timer.split();
-		System.out.println(String.format("Q2.run_for(%d) - \n\tRuntime = %d ms\n\ttotalLinks = %d\n\ttotalCuts=%d\n\tPotential=%d\n\tAlt calc=%d", m, pace, H.totalLinks(), H.totalCuts(), H.potential(), linkTot));
+		System.out.println(String.format("Q2.run_for(%d) - \n\tRuntime = %d ms\n\ttotalLinks = %d\n\ttotalCuts=%d\n\tPotential=%d", m, pace, H.totalLinks(), H.totalCuts(), H.potential()));
 
 		Logger.reset();
 		timer.reset();
