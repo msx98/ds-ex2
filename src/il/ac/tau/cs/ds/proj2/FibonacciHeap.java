@@ -915,8 +915,7 @@ public class FibonacciHeap
 		 * 
 		 * @param HeapNode x
 		 * @pre x.parent != null
-		 * @pre this.contains(x)
-		 * @post x.parent == null && this.treeRoots[0] == x
+		 * @post x.parent == null, x.parent.child is modified
 		 * @complexity O(1)
 		 */
 		private void cut() {
