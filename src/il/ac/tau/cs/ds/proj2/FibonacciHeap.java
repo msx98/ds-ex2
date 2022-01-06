@@ -343,7 +343,7 @@ public class FibonacciHeap
 		Logger.assertd(this.minNode.getKey() != Integer.MIN_VALUE);
 		// still, just in case...
 		if (this.minNode.getKey() == Integer.MIN_VALUE) {
-			// FIXME - this is a dirty solution and I'm not sure it'll work
+			//         this is a dirty solution and I'm not sure it'll work
 			//         but this case will supposedly not be tested anyway
 			this.minNode = x;
 		}
@@ -419,7 +419,7 @@ public class FibonacciHeap
 	 */
 	public static int totalLinks()
 	{
-		return COUNT_LINKS; // FIXME - might not wanna use Logger
+		return COUNT_LINKS;
 	}
 
 	/**
@@ -433,7 +433,7 @@ public class FibonacciHeap
 	 */
 	public static int totalCuts()
 	{
-		return COUNT_CUTS; // FIXME - might not wanna use Logger
+		return COUNT_CUTS;
 	}
 	
 	/**
@@ -578,32 +578,6 @@ public class FibonacciHeap
 	}
 	
 	/**
-	 * private static FibonacciHeap createFibonacciHeapFromNode(HeapNode first)
-	 * @param: first
-	 * @return: new FibonacciHeap with correct properties and first node first
-	 * @complexity: O(s) with n being the number of siblings of first
-	 */
-	private static FibonacciHeap createFibonacciHeapFromNode(HeapNode first) {
-		FibonacciHeap H = new FibonacciHeap();
-		if (first == null) return H;
-		H.first = first;
-		H.minNode = first;
-		H.numOfNodes = 1;
-		H.markedNodes = 0;
-		
-		HeapNode p = H.first;	
-		do {
-			p.setParent(null); // FIXME - do we want this here or outside?
-			if (H.minNode.getKey() < p.getKey()) H.minNode = p;
-			H.numOfNodes++;
-			p.mark = false;
-			p = p.getNext();
-		} while (p != H.first);
-		
-		return H;
-	}
-	
-	/**
 	 * private HeapNode getFirst()
 	 * 
 	 * Returns pointer to first node in heap
@@ -684,7 +658,7 @@ public class FibonacciHeap
 	 * Divides heap H into logn buckets
 	 * Bucket no. k contains one tree of rank k
 	 * 
-	 * @complexity: O(logn) // FIXME
+	 * @complexity: O(logn)
 	 */
 	private static HeapNode[] toBuckets(FibonacciHeap H) {
 		HeapNode B[];
@@ -763,9 +737,6 @@ public class FibonacciHeap
 	private static HeapNode link(HeapNode node1, HeapNode node2) {
 		
 		COUNT_LINKS += 1;
-		
-		// FIXME - what happens if the trees are not perfect?
-		//         do we care?
 		
 		Logger.assertd_iff(node1 == null, node2 == null);
 		if (node1 == null || node2 == null) return null;

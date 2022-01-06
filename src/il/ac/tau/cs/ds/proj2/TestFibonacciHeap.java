@@ -80,7 +80,7 @@ public class TestFibonacciHeap {
             System.out.printf("Inserts/DeleteMins oredered for i=%d passed%n", i);
             insertionDeleMinTester(reversed);
             System.out.printf("Inserts/DeleteMins reversed for i=%d passed%n", i);
-            insertionDeletionTester(reversed);
+            insertionDeletionTester(shuffled);
             System.out.printf("Inserts/Deletes shuffled for i=%d passed%n", i);
             insertionDeletionTester(ordered);
             System.out.printf("Inserts/Deletes ordered for i=%d passed%n", i);

@@ -32,7 +32,7 @@ public class Tester {
   }
 
   public static void main(String[] args) {
-	  //runAllTests();
+	  runAllTests();
 	  /*int k = 13;
 	  int countKeys = (1<<(k-2))+1;//1024;//(int)Math.pow(2, 5);
 	  int n = countKeys;
@@ -46,7 +46,7 @@ public class Tester {
 	  System.out.println("Links: " + String.valueOf(h.totalLinks()));
 	  System.out.println("Pot: " + String.valueOf(h.potential()));
 	  System.out.println("CalcPot: " + String.valueOf(logphi(countKeys)));*/
-	  Q1.run();
+	  //Q1.run();
 	  /*System.out.println();
 	  System.out.println();
 	  System.out.println();
@@ -54,6 +54,8 @@ public class Tester {
   }
   
   public static void runAllTests() {
+	  
+	  TestFibonacciHeap.main(null);
 
       grade = 80.0;
       testScore = 64.0 / 29;
