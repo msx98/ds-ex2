@@ -14,14 +14,43 @@ public class Tester {
   static FibonacciHeap fibonacciHeap;
   static double grade;
   static double testScore;
+  
+  public static double goldenRatio() {
+	  return 1.61803398875;
+  }
+  
+  public static double logphi(int n) {
+	  return Math.log(n)/Math.log(goldenRatio());
+  }
+  
+  public static double log2(int n) {
+	  return Math.log(n)/Math.log(2);
+  }
+  
+  public static int linkCalc(int n) {
+	  return (n+0)-(int)Math.floor(log2(n));
+  }
 
   public static void main(String[] args) {
 	  //runAllTests();
+	  /*int k = 13;
+	  int countKeys = (1<<(k-2))+1;//1024;//(int)Math.pow(2, 5);
+	  int n = countKeys;
+	  int expLinks =  (n>>2)+2-(int)Math.floor(n);//(1<<k)-k;//linkCalc(countKeys-1);
+	  System.out.println("Calc: " + String.valueOf(expLinks));
+	  
+	  FibonacciHeap h = new FibonacciHeap();
+	  for (int i=0; i<countKeys; i++) h.insert(i);
+	  int toDelete = (int) ((float)0.75*(float)countKeys);
+	  for (int i=1; i<=toDelete; i++) h.deleteMin();
+	  System.out.println("Links: " + String.valueOf(h.totalLinks()));
+	  System.out.println("Pot: " + String.valueOf(h.potential()));
+	  System.out.println("CalcPot: " + String.valueOf(logphi(countKeys)));*/
 	  Q1.run();
+	  /*System.out.println();
 	  System.out.println();
 	  System.out.println();
-	  System.out.println();
-	  Q2.run();
+	  Q2.run();*/
   }
   
   public static void runAllTests() {
